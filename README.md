@@ -23,6 +23,13 @@ quarantine**:
 Both are parameterized by **R0** rather than a raw contact rate (see
 [R0 calibration](#r0-calibration)).
 
+Results update as you change inputs, after a 350 ms pause. Runs that are
+large (agents × simulations × days above 5×10⁷) first show a preview from 40
+simulations, then refine to the full run. The preview's simulations are the
+same as the first 40 of the full run, since each simulation has its own
+seed. A new change made during a run is queued, not piled up. With the
+`manual` attribute, a Run button starts runs instead.
+
 ## Quick start
 
 ```sh
@@ -64,6 +71,7 @@ Copy it anywhere and add the script and an element:
 | `default-state` | dashboard, school | Two-letter state preselected in the school selector. |
 | `preset` | dashboard, mixing | Id of the population preset (from `data/populations/index.json`). |
 | `nsims` | school, mixing | Default number of simulations. |
+| `manual` | school, mixing | Show a Run button instead of updating results automatically. |
 | `base-url` | all | Folder holding `data/` and `assets/` (default: next to the script). |
 | `engine-url` | all | URL of epiworldjs's `src/index.js`, e.g. `https://cdn.jsdelivr.net/npm/epiworldjs@0.18.0-0/src/index.js`. |
 | `hide-description`, `hide-acknowledgements` | all | Hide those cards. |
@@ -80,18 +88,20 @@ ancestor:
 
 | Property | Default |
 |---|---|
-| `--md-primary` / `--md-on-primary` | `#0d6efd` / `#fff` |
+| `--md-primary` / `--md-on-primary` | `#2f5fd0` / `#fff` |
 | `--md-font-family`, `--md-font-size` | system UI, `15px` |
-| `--md-color-no-quarantine`, `--md-color-quarantine` | `#c11a01`, `#307bc2` (value boxes and chart) |
-| `--md-background`, `--md-surface`, `--md-surface-alt` | white, white, `#f6f7f9` |
-| `--md-text`, `--md-text-muted`, `--md-border` | `#212529`, `#6c757d`, `#dee2e6` |
-| `--md-radius`, `--md-shadow`, `--md-sidebar-width` | `8px`, subtle, `300px` |
+| `--md-color-no-quarantine`, `--md-color-quarantine` | `#c11a01`, `#307bc2` (tiles and charts) |
+| `--md-color-good` | `#1b7f4a` (the "quarantine prevents" tile) |
+| `--md-background`, `--md-surface`, `--md-surface-alt` | `#f6f7f9`, white, `#f1f3f6` |
+| `--md-text`, `--md-text-muted`, `--md-border` | `#1d2433`, `#5f6b7a`, `#e3e6eb` |
+| `--md-radius`, `--md-shadow`, `--md-sidebar-width` | `12px`, subtle, `320px` |
 | `--md-warning-bg`, `--md-warning-text`, `--md-warning-border`, `--md-error` | Bootstrap-like |
 | `--md-tooltip-bg`, `--md-tooltip-text` | dark |
 
 For finer control, use these parts with `::part()`:
 
-- `sidebar`, `run-button`, `accordion`, `card`, `description`, `acknowledgements`, `population`
+- `sidebar`, `run-button` (manual mode), `accordion`, `intro`, `about`, `card`, `description`, `acknowledgements`, `population`, `school-chip`
+- Results: `tile`, `tile-without`, `tile-with`, `tile-impact`, `download-button`
 - On the dashboard: `tabs`, `tab`, `footer`
 
 For example: `measles-school-sim::part(run-button) { text-transform: uppercase; }`.
@@ -104,10 +114,11 @@ to your own analytics.
 
 | Event | `detail` |
 |---|---|
-| `md-run-start` | `{specs}`: the epiworldjs specs about to run |
-| `md-run-complete` | `{results: {with, without}: {meanCases, meanHospitalizations}, specs, ms}` |
+| `md-run-start` | `{specs, preview}`: the epiworldjs specs about to run |
+| `md-run-complete` | `{results: {with, without}: {meanCases, meanHospitalizations}, specs, ms, preview}`. `preview` is true for the quick first pass of a large run. |
 | `md-run-error` | `{error}` |
 | `md-school-selected` | `{school: {state, county, name, id, rate, size}}` |
+| `md-school-cleared` | none |
 
 Calling `element.run()` starts a run from script.
 
@@ -157,6 +168,9 @@ npm test            # unit tests + engine tests (epiworldjs in Node), incl. the 
 npm run test:e2e    # Playwright on the built site (npm run build first; PW_CHANNEL=chrome to use Chrome)
 npm run test:native # native C++ vs WebAssembly, see below
 ```
+
+Pull requests get a comment with a downloadable build of the site
+(`.github/workflows/pr-preview.yml`).
 
 `npm run test:native` checks that the WebAssembly engine reproduces the C++
 library exactly:

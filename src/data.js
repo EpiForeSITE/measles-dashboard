@@ -36,7 +36,8 @@ async function fetchJSON(path) {
  * @typedef {object} SchoolSource
  * @property {() => Promise<string[]>} states
  * @property {(state: string) => Promise<string[]>} counties
- * @property {(state: string, county: string) => Promise<School[]>} schools
+ * @property {(state: string, county?: string) => Promise<School[]>} schools
+ *   Schools of a state, or of one county when `county` is given.
  */
 
 /** @returns {SchoolSource} */
@@ -51,10 +52,10 @@ export function bundledSchools() {
     },
     async schools(state, county) {
       const data = await load(state);
-      const k = data.counties.indexOf(county);
+      const k = county ? data.counties.indexOf(county) : -1;
       return data.schools
-        .filter((row) => row[0] === k)
-        .map(([, name, id, rate, size]) => ({ state, county, name, id, rate, size: size ?? null }));
+        .filter((row) => !county || row[0] === k)
+        .map(([c, name, id, rate, size]) => ({ state, county: data.counties[c], name, id, rate, size: size ?? null }));
     },
   };
 }
@@ -104,7 +105,7 @@ export function uploadedSchools(rows) {
     async states() { return sorted(rows.map((r) => r.state)); },
     async counties(state) { return sorted(rows.filter((r) => r.state === state).map((r) => r.county)); },
     async schools(state, county) {
-      return rows.filter((r) => r.state === state && r.county === county)
+      return rows.filter((r) => r.state === state && (!county || r.county === county))
         .sort((a, b) => a.name.localeCompare(b.name));
     },
   };
@@ -157,4 +158,28 @@ export function validatePopulation(p) {
     errors.push("The contact matrix has no contacts.");
   }
   return errors;
+}
+
+const fold = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+/**
+ * Schools whose name or county contain every word of `query` (ignoring case
+ * and accents), names starting with the query first.
+ *
+ * @param {School[]} schools
+ * @param {string} query
+ * @param {number} [limit]
+ * @returns {School[]}
+ */
+export function searchSchools(schools, query, limit = 50) {
+  const words = fold(query).split(/\s+/).filter(Boolean);
+  if (!words.length) return schools.slice(0, limit);
+  const out = [];
+  for (const s of schools) {
+    const name = fold(s.name);
+    const text = `${name} ${fold(s.county)}`;
+    if (words.every((w) => text.includes(w))) out.push({ s, rank: name.startsWith(words[0]) ? 0 : 1 });
+  }
+  out.sort((a, b) => a.rank - b.rank || a.s.name.localeCompare(b.s.name));
+  return out.slice(0, limit).map((x) => x.s);
 }

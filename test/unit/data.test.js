@@ -63,3 +63,16 @@ test("school upload: rejects what the Shiny app rejects", () => {
   expect(() => parseSchoolCSV(header + "UT,a,b,c,0.5,60000\n")).toThrow(/num_students/);
   expect(() => parseSchoolCSV(header + "UT,a,b,c,0.5,\n".repeat(10001))).toThrow(/too many/);
 });
+
+test("searchSchools matches every word in name or county, accent-insensitive", async () => {
+  const { searchSchools } = await import("../../src/data.js");
+  const schools = [
+    { name: "Adele C. Young Intermediate", county: "Box Elder" },
+    { name: "Young Elementary", county: "Salt Lake" },
+    { name: "Escuela José Martí", county: "Box Elder" },
+  ];
+  expect(searchSchools(schools, "young").map((s) => s.name)).toEqual(["Young Elementary", "Adele C. Young Intermediate"]);
+  expect(searchSchools(schools, "adele young")).toHaveLength(1);
+  expect(searchSchools(schools, "jose box")).toHaveLength(1);
+  expect(searchSchools(schools, "")).toHaveLength(3);
+});

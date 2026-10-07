@@ -38,6 +38,8 @@ export class MixingSim extends SimBase {
 
   get inputs() { return MIXING_INPUTS; }
 
+  get heading() { return "Measles in a community"; }
+
   get _n() {
     return this._population?.groups.reduce((a, g) => a + g.size, 0) ?? 0;
   }
@@ -70,10 +72,12 @@ export class MixingSim extends SimBase {
     e.stopPropagation();
     this._population = e.detail.population;
     this._populationErrors = e.detail.errors;
+    this.requestRun({ immediate: !this._results && !this._running });
   }
 
   _onSchool(e) {
     this.values = { ...this.values, propVaccinated: Math.round(e.detail.school.rate * 100) / 100 };
+    this.requestRun();
   }
 
   _period() {
@@ -91,65 +95,58 @@ export class MixingSim extends SimBase {
     if (key !== "r0" || !this._population || this._populationErrors.length) return nothing;
     const r0 = this._calibrate ? v.r0 : this._impliedR0();
     const reff = effectiveR(r0, v.propVaccinated, v.vaxEfficacy);
-    return html`<p class="note">
+    return html`<div class="note">
       ${this._calibrate
-        ? html`Contact matrix rescaled to R0 = <strong>${v.r0}</strong> (mean infectious period ${this._period().toFixed(2)} days).`
-        : html`<strong>Calibration off:</strong> the entered matrix implies R0 = <strong>${r0.toFixed(2)}</strong>; this input is ignored.`}
-      Effective R at start: <strong>${reff.toFixed(2)}</strong>;
-      herd-immunity threshold: ${(herdImmunityThreshold(r0) * 100).toFixed(0)}% immune.</p>`;
+        ? html`Contacts are scaled so that R0 = <strong>${v.r0}</strong> (infectious for ${this._period().toFixed(1)} days on average).`
+        : html`<strong>Scaling off:</strong> the matrix as entered implies R0 = <strong>${r0.toFixed(1)}</strong>; this input is ignored.`}
+      At this coverage, one case infects <strong>${reff.toFixed(1)}</strong> others on average
+      (herd immunity needs ${(herdImmunityThreshold(r0) * 100).toFixed(0)}% immune).</div>`;
   }
 
   renderSidebarTop() {
     return html`
-      <details class="accordion" part="accordion" @md-school-selected=${this._onSchool}>
-        <summary>Vaccination from a school</summary>
-        <div class="accordion-body"><md-school-selector></md-school-selector></div>
+      <details class="section" part="accordion" @md-school-selected=${this._onSchool} style="border-top:none">
+        <summary>Use a school's vaccination rate</summary>
+        <div class="section-body"><md-school-selector></md-school-selector></div>
       </details>`;
   }
 
-  renderDescription() {
+  lede() {
+    const v = this.values;
+    const k = v.initialCases;
+    const n = this._n;
+    const g = this._population?.groups.length ?? 0;
+    return html`${k} ${k === 1 ? "case" : "cases"} of measles introduced into a community of <strong>${n.toLocaleString()}</strong>
+      people in ${g} ${g === 1 ? "group" : "groups"} with <strong>${Math.round((v.propVaccinated ?? 0) * 100)}%</strong> vaccinated:
+      expected outbreak with and without quarantine of traced contacts.`;
+  }
+
+  renderAbout() {
     return html`
-      <section class="card" part="card description">
-        <div class="card-body">
-          <h2>Modeling Measles in a Community</h2>
-          <p>This model simulates measles in a larger population split into <strong>groups</strong> (for example schools, age groups, or
-            neighborhoods) that mix with each other at different rates, and compares outbreaks with and without quarantine of traced contacts.
-            Each detected case is isolated, and its recent contacts are traced and asked to quarantine.</p>
-          <p>The contact matrix sets <em>who mixes with whom</em>. By default it is rescaled so that the model has the chosen basic
-            reproductive number (R0), which keeps the mixing pattern while making the transmission intensity easy to interpret.
-            Vaccination coverage applies to everyone. Results are for the whole population.</p>
-        </div>
-      </section>`;
+      <p>This model simulates measles in a larger population split into <strong>groups</strong> (for example schools, age groups or
+        neighborhoods) that mix with each other at different rates. Detected cases are isolated, and their recent contacts are traced and
+        asked to quarantine; the comparison is with and without that quarantine.</p>
+      <p>The contact matrix sets <em>who mixes with whom</em>. By default it is rescaled so the model has the chosen basic reproductive
+        number (R0), which keeps the mixing pattern while making transmission easy to interpret. Vaccination coverage applies to
+        everyone, and results are for the whole population.</p>`;
   }
 
   renderBeforeResults() {
     return html`
       <section class="card" part="card population">
-        <div class="card-header">Population &amp; contacts</div>
+        <div class="card-header"><h3>Population &amp; contacts</h3><span class="hint">Edit groups and daily contacts; results update automatically</span></div>
         <div class="card-body">
           <md-group-editor preset=${this.preset ?? "default-3group"} .scaled=${this._scaled()} @md-population=${this._onPopulation}></md-group-editor>
           <label class="calibrate small">
-            <input type="checkbox" .checked=${this._calibrate} @change=${(e) => { this._calibrate = e.target.checked; }} />
-            Rescale the contact matrix to match R0 (recommended)
+            <input type="checkbox" .checked=${this._calibrate} @change=${(e) => { this._calibrate = e.target.checked; this.requestRun(); }} />
+            Scale contacts to match R0 (recommended)
           </label>
         </div>
       </section>`;
   }
 
-  takeHome() {
-    const v = this._ranWith ?? this.values;
-    const k = v.initialCases;
-    const n = this._ranN ?? this._n;
-    return `When ${k} ${k === 1 ? "case" : "cases"} of measles ${k === 1 ? "is" : "are"} introduced into a community of ${n.toLocaleString()} people, we expect the following outbreak sizes and number of hospitalizations based on whether quarantine procedures were implemented:`;
-  }
-
-  async run() {
-    this._ranN = this._n;
-    return super.run();
-  }
-
   thresholds() {
-    return defaultThresholds(this._ranN ?? this._n);
+    return defaultThresholds(this._resultsN ?? this._n);
   }
 
   get filename() { return "measles-community-simulations.csv"; }

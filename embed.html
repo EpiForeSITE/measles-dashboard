@@ -23,7 +23,7 @@
       --md-color-no-quarantine: #a23b2a;
     }
     /* ...and ::part() for finer control */
-    measles-school-sim::part(run-button) { text-transform: uppercase; letter-spacing: 0.05em; }
+    measles-school-sim::part(tile) { border-radius: 0; }
   </style>
   <script type="module" src="/src/index.js"></script>
 </head>
@@ -37,7 +37,7 @@
 &lt;!-- Both simulators, as tabs --&gt;
 &lt;measles-dashboard default-state="UT"&gt;&lt;/measles-dashboard&gt;
 
-&lt;!-- Or just one --&gt;
+&lt;!-- Or just one (add `manual` for a Run button instead of live updates) --&gt;
 &lt;measles-school-sim default-state="UT" hide-acknowledgements&gt;&lt;/measles-school-sim&gt;
 &lt;measles-mixing-sim preset="default-3group"&gt;&lt;/measles-mixing-sim&gt;</pre>
     <p>Restyle it with CSS custom properties (<code>--md-primary</code>, <code>--md-font-family</code>, <code>--md-color-quarantine</code>, …) and
