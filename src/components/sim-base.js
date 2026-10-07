@@ -41,7 +41,7 @@ export class SimBase extends LitElement {
     _results: { state: true },
     _resultsN: { state: true },
     _running: { state: true },
-    _preview: { state: true },
+    _refining: { state: true },
     _dirty: { state: true },
     _error: { state: true },
     _elapsed: { state: true },
@@ -164,6 +164,8 @@ export class SimBase extends LitElement {
       if (cost(specs.with) > PREVIEW_COST && values.nsims > PREVIEW_SIMS) {
         await this._execute(this.buildSpecs({ ...values, nsims: PREVIEW_SIMS }), true);
         if (this._pending) return;
+        // The preview is on screen while the full run completes
+        this._refining = true;
       }
       await this._execute(specs, false);
     } catch (error) {
@@ -171,7 +173,7 @@ export class SimBase extends LitElement {
       this._emit("md-run-error", { error });
     } finally {
       this._running = false;
-      this._preview = false;
+      this._refining = false;
       if (this._pending) {
         this._pending = false;
         this.run();
@@ -180,7 +182,6 @@ export class SimBase extends LitElement {
   }
 
   async _execute(specs, preview) {
-    this._preview = preview;
     this._emit("md-run-start", { specs, preview });
     const start = performance.now();
     const [without, withQ] = await runAll([specs.without, specs.with]);
@@ -249,8 +250,8 @@ export class SimBase extends LitElement {
     const n = this._results?.with.nsims;
     if (this.errors.length) return html`<span class="status invalid" role="status"><span class="dot"></span>Check the inputs</span>`;
     if (this._running) {
-      return html`<span class="status busy" role="status"><span class="dot"></span>${this._preview
-        ? `Preview from ${PREVIEW_SIMS} simulations · refining…`
+      return html`<span class="status busy" role="status"><span class="dot"></span>${this._refining
+        ? `Showing a quick preview (${PREVIEW_SIMS} runs), refining…`
         : "Updating…"}</span>`;
     }
     if (this._error) return html`<span class="status invalid" role="status"><span class="dot"></span>Run failed</span>`;

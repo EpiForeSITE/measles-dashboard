@@ -4,7 +4,8 @@ test.beforeEach(async ({ page }) => {
   page.on("pageerror", (error) => { throw error; });
 });
 
-const done = (sim) => sim.locator(".status").filter({ hasText: /simulations ·/ });
+// The status once a run (not a preview) is complete, e.g. "400 simulations · 0.2 s"
+const done = (sim) => sim.locator(".status").filter({ hasText: /^\s*[\d,]+ simulations · [\d.]+ s\s*$/ });
 
 test("school: results on load, search a school, results update", async ({ page }) => {
   await page.goto("/");
@@ -62,6 +63,7 @@ test("community: preview, then full results; editing the population re-runs", as
   await page.goto("/");
   await page.getByRole("tab", { name: "Community" }).click();
   const sim = page.locator("measles-mixing-sim");
+  await expect(sim.locator(".status")).toContainText("quick preview", { timeout: 60000 });
   await expect(done(sim)).toBeVisible({ timeout: 120000 });
   await expect(sim.locator(".status")).toContainText("400 simulations");
 
