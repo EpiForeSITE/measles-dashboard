@@ -1,0 +1,106 @@
+{
+ "source": "epiENGAGE / TACC measles-dashboard (https://github.com/TACC/measles-dashboard) and Utah DHHS, via epiworldRShiny",
+ "hasEnrollment": false,
+ "states": [
+  {
+   "code": "AL",
+   "n": 1575
+  },
+  {
+   "code": "AZ",
+   "n": 1444
+  },
+  {
+   "code": "CA",
+   "n": 6623
+  },
+  {
+   "code": "CO",
+   "n": 3447
+  },
+  {
+   "code": "CT",
+   "n": 718
+  },
+  {
+   "code": "IA",
+   "n": 1316
+  },
+  {
+   "code": "ID",
+   "n": 750
+  },
+  {
+   "code": "IN",
+   "n": 1941
+  },
+  {
+   "code": "KS",
+   "n": 242
+  },
+  {
+   "code": "KY",
+   "n": 1431
+  },
+  {
+   "code": "LA",
+   "n": 1427
+  },
+  {
+   "code": "MA",
+   "n": 1510
+  },
+  {
+   "code": "MD",
+   "n": 1016
+  },
+  {
+   "code": "ME",
+   "n": 502
+  },
+  {
+   "code": "MI",
+   "n": 2717
+  },
+  {
+   "code": "MN",
+   "n": 1627
+  },
+  {
+   "code": "NC",
+   "n": 1814
+  },
+  {
+   "code": "NM",
+   "n": 667
+  },
+  {
+   "code": "NY",
+   "n": 5181
+  },
+  {
+   "code": "OR",
+   "n": 1687
+  },
+  {
+   "code": "PA",
+   "n": 3084
+  },
+  {
+   "code": "TX",
+   "n": 1847
+  },
+  {
+   "code": "UT",
+   "n": 1387
+  },
+  {
+   "code": "WA",
+   "n": 2729
+  },
+  {
+   "code": "WI",
+   "n": 2642
+  }
+ ]
+}

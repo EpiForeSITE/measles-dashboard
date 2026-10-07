@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+  # Native C++ (epiworld + measles headers) vs the WebAssembly build: the
+  # dashboard's specs must give identical outputs. Needs clang and libc++,
+  # and the epiworldjs sources at the version the npm package was built from.
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Resolve the epiworldjs version
+        id: ewjs
+        run: echo "version=$(node -p 'require("./node_modules/epiworldjs/package.json").version')" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: UofUEpiBio/epiworldjs
+          ref: v${{ steps.ewjs.outputs.version }}
+          path: epiworldjs-src
+          sparse-checkout: |
+            vendor
+            package.json
+      - run: sudo apt-get update && sudo apt-get install -y clang libc++-dev libc++abi-dev
+      - run: npm run test:native
+        env:
+          EPIWORLDJS_DIR: ${{ github.workspace }}/epiworldjs-src

@@ -1,0 +1,16 @@
+{
+  "id": "default-3group",
+  "name": "Three groups of 3,000 (measles package example)",
+  "source": "Default of the MeaslesMixing model in the measles R package and epiworldjs",
+  "notes": "Daily contacts; row i, column j is the average number of contacts a person in group i has with people in group j. The dashboard rescales the matrix to the chosen R0 unless calibration is turned off.",
+  "groups": [
+    { "name": "Group 1", "size": 3000 },
+    { "name": "Group 2", "size": 3000 },
+    { "name": "Group 3", "size": 3000 }
+  ],
+  "contact_matrix": [
+    [13.5, 0.75, 0.75],
+    [1.5, 12, 1.5],
+    [1.5, 3, 10.5]
+  ]
+}

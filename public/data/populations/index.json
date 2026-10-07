@@ -1,0 +1,5 @@
+{
+  "presets": [
+    { "id": "default-3group", "name": "Three groups of 3,000 (measles package example)", "file": "default-3group.json" }
+  ]
+}

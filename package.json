@@ -1,0 +1,34 @@
+{
+  "name": "measles-dashboard",
+  "version": "0.1.0",
+  "description": "Static, embeddable measles outbreak dashboard powered by epiworldjs (WebAssembly).",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/measles-dashboard.js",
+  "module": "./dist/measles-dashboard.js",
+  "exports": {
+    ".": "./dist/measles-dashboard.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "data": "node scripts/build-school-data.mjs",
+    "build": "vite build && node scripts/postbuild.mjs",
+    "preview": "vite preview --port 4173",
+    "test": "vitest run",
+    "test:native": "node scripts/dump-specs.mjs && make -C test/native && vitest run --config vitest.native.config.js",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@observablehq/plot": "^0.6.17",
+    "epiworldjs": "0.18.0-0",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "vite": "^6.4.4",
+    "vitest": "^3.2.7"
+  }
+}

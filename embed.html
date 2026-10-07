@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%227%22 fill=%22%23c11a01%22/%3E%3Ccircle cx=%225%22 cy=%226%22 r=%221.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2210%22 cy=%225%22 r=%221%22 fill=%22%23fff%22/%3E%3Ccircle cx=%229%22 cy=%2210.5%22 r=%221.6%22 fill=%22%23fff%22/%3E%3C/svg%3E" />
+  <title>Embedding the Measles Simulator</title>
+  <style>
+    body { margin: 0; font-family: Georgia, "Times New Roman", serif; background: #fdfaf4; color: #2b2b2b; }
+    .banner { background: #1d4f3a; color: #fff; padding: 1rem 1.5rem; }
+    .banner h1 { margin: 0; font-size: 1.3rem; }
+    article { max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+    pre { background: #f1ede4; padding: 0.75rem 1rem; overflow-x: auto; border-radius: 6px; font-size: 0.85rem; }
+    #log { font-family: ui-monospace, monospace; font-size: 0.8rem; color: #555; min-height: 1.2em; }
+
+    /* Restyle the dashboard from the host page with CSS custom properties... */
+    measles-school-sim {
+      --md-primary: #1d4f3a;
+      --md-font-family: Georgia, "Times New Roman", serif;
+      --md-radius: 2px;
+      --md-surface-alt: #f1ede4;
+      --md-color-quarantine: #1f6f8b;
+      --md-color-no-quarantine: #a23b2a;
+    }
+    /* ...and ::part() for finer control */
+    measles-school-sim::part(run-button) { text-transform: uppercase; letter-spacing: 0.05em; }
+  </style>
+  <script type="module" src="/src/index.js"></script>
+</head>
+<body>
+  <div class="banner"><h1>Example County Health Department</h1></div>
+  <article>
+    <h2>Measles in our schools</h2>
+    <p>This page shows how to embed the simulator in another site. Load one script and add an element:</p>
+<pre>&lt;script type="module" src="https://YOUR-HOST/measles-dashboard/measles-dashboard.js"&gt;&lt;/script&gt;
+
+&lt;!-- Both simulators, as tabs --&gt;
+&lt;measles-dashboard default-state="UT"&gt;&lt;/measles-dashboard&gt;
+
+&lt;!-- Or just one --&gt;
+&lt;measles-school-sim default-state="UT" hide-acknowledgements&gt;&lt;/measles-school-sim&gt;
+&lt;measles-mixing-sim preset="default-3group"&gt;&lt;/measles-mixing-sim&gt;</pre>
+    <p>Restyle it with CSS custom properties (<code>--md-primary</code>, <code>--md-font-family</code>, <code>--md-color-quarantine</code>, …) and
+      <code>::part()</code>; listen to <code>md-run-start</code>, <code>md-run-complete</code> and <code>md-school-selected</code> events.
+      See the README for the full list.</p>
+
+    <measles-school-sim id="sim" default-state="UT" hide-description></measles-school-sim>
+    <p id="log" aria-live="polite"></p>
+  </article>
+  <script type="module">
+    const sim = document.getElementById("sim");
+    const log = document.getElementById("log");
+    sim.addEventListener("md-school-selected", (e) => { log.textContent = `md-school-selected: ${e.detail.school.name}`; });
+    sim.addEventListener("md-run-complete", (e) => {
+      const r = e.detail.results;
+      log.textContent = `md-run-complete in ${Math.round(e.detail.ms)} ms: ${r.without.meanCases.toFixed(1)} cases without quarantine, ${r.with.meanCases.toFixed(1)} with.`;
+    });
+  </script>
+</body>
+</html>
