@@ -99,3 +99,16 @@ test("embedding: host styles, events, and manual mode", async ({ page }) => {
   await expect(done(manual)).toBeVisible({ timeout: 60000 });
   await expect(manual.locator(".lede")).toContainText("800");
 });
+
+test("version: header badge and footer link to the latest release", async ({ page }) => {
+  const { readFileSync } = await import("node:fs");
+  const { version } = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
+  const releases = "https://github.com/EpiForeSITE/measles-dashboard/releases/latest";
+  await page.goto("/");
+  const badge = page.locator("#version");
+  await expect(badge).toHaveText(`v${version}`);
+  await expect(badge).toHaveAttribute("href", releases);
+  const footer = page.locator("measles-dashboard").locator("footer a").first();
+  await expect(footer).toHaveText(`Measles dashboard v${version}`);
+  await expect(footer).toHaveAttribute("href", releases);
+});

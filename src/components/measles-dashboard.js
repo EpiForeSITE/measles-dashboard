@@ -2,6 +2,7 @@ import { LitElement, css, html, nothing } from "lit";
 import { configure } from "../config.js";
 import { engineVersion } from "../engine.js";
 import { controls, tokens } from "../styles/theme.js";
+import { RELEASES_URL, VERSION } from "../version.js";
 import "./mixing-sim.js";
 import "./school-sim.js";
 
@@ -96,8 +97,9 @@ export class MeaslesDashboard extends LitElement {
       ${tabs.map((t) => html`<div role="tabpanel" id="panel-${t}" aria-labelledby="tab-${t}" ?hidden=${t !== active}>
         ${this._visited.has(t) || t === active ? TABS[t].tag(this) : nothing}</div>`)}
       ${this.hideFooter ? nothing : html`<footer part="footer">
-        Measles dashboard${this._version ? html` | epiworld ${this._version.epiworld} | measles ${this._version.measles}` : nothing}
-        | <a href="https://github.com/UofUEpiBio/epiworldjs" target="_blank" rel="noopener">epiworldjs</a>
+        <a href=${RELEASES_URL} target="_blank" rel="noopener" title="Latest release on GitHub">Measles dashboard v${VERSION}</a>
+        ${this._version ? html` · epiworld ${this._version.epiworld} · measles ${this._version.measles}` : nothing}
+        · <a href="https://github.com/UofUEpiBio/epiworldjs" target="_blank" rel="noopener">epiworldjs</a>
         <br /><strong>The University of Utah</strong>
       </footer>`}
     `;

@@ -1,0 +1,25 @@
+# Version check for pull requests (https://github.com/gvegayon/please-bump).
+#
+# The version lives in package.json and follows semantic versioning. With the
+# default `unchanged-policy: release`, a PR may leave the version alone while
+# it is unreleased; once vX.Y.Z is published as a GitHub release, the next PR
+# that touches the dashboard must bump it (patch: fixes; minor: features;
+# major: breaking changes to the embedding API).
+version: 1
+
+groups:
+  dashboard:
+    preset: node-package
+    files: [package.json]
+    # Changes to these make a PR "touch" the dashboard; tests, docs and CI
+    # alone do not need a bump.
+    paths: |
+      src/
+      public/
+      index.html
+      embed.html
+      package.json
+      package-lock.json
+      vite.config.js
+      scripts/
+      data-raw/

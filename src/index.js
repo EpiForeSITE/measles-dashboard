@@ -4,6 +4,7 @@
  */
 
 export { configure } from "./config.js";
+export { VERSION, RELEASES_URL, REPOSITORY_URL } from "./version.js";
 export { loadEngine, runAll } from "./engine.js";
 export * from "./analysis.js";
 export * from "./r0.js";

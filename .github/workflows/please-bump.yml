@@ -1,0 +1,24 @@
+name: please-bump
+
+# Fails a PR that changes the dashboard without bumping its version
+# (package.json, semantic versioning) once the current version has been
+# released. See .github/please-bump.yaml.
+
+on:
+  pull_request:
+    # labeled/unlabeled/edited re-run the check when a waiver label or
+    # marker is added or removed.
+    types: [opened, synchronize, reopened, labeled, unlabeled, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  please-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # please-bump needs the base branch's history
+      - uses: gvegayon/please-bump@v1

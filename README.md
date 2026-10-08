@@ -30,6 +30,25 @@ same as the first 40 of the full run, since each simulation has its own
 seed. A new change made during a run is queued, not piled up. With the
 `manual` attribute, a Run button starts runs instead.
 
+## Versioning and releases
+
+The project follows [semantic versioning](https://semver.org/), starting at
+0.1.0. The version lives in `package.json`, and the site shows it in the
+header and footer, linked to the
+[latest release](https://github.com/EpiForeSITE/measles-dashboard/releases/latest).
+Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
+[please-bump](https://github.com/gvegayon/please-bump) checks every PR
+(`.github/please-bump.yaml`).
+
+- Once a version is released, the next PR that changes the dashboard
+  (`src/`, `public/`, pages, build) must bump it: patch for fixes, minor for
+  features, major for breaking changes to the embedding API.
+- PRs that only change tests, docs or CI don't need a bump.
+- A `no-version-bump` label waives the check.
+
+To release, publish a GitHub release tagged `vX.Y.Z` matching `package.json`.
+
 ## Quick start
 
 ```sh
