@@ -21,4 +21,4 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # please-bump needs the base branch's history
-      - uses: gvegayon/please-bump@v1
+      - uses: gvegayon/please-bump@v0.4.1
