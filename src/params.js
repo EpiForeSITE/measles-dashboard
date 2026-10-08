@@ -18,6 +18,8 @@
  * @property {number} [step]
  * @property {boolean} [integer]
  * @property {boolean} [optional] Empty is allowed (e.g., the seed).
+ * @property {"percent"} [format] Show a 0–1 value as a percentage.
+ * @property {string} [unit] Shown after the value, e.g. "days".
  * @property {string} tooltip
  * @property {"main" | "quarantine" | "advanced"} section
  */
@@ -26,46 +28,46 @@
 const COMMON = [
   { key: "initialCases", label: "Initial cases", type: "number", value: 1, min: 1, step: 1, integer: true, section: "main",
     tooltip: "# of people infected with measles at the start of the simulation" },
-  { key: "propVaccinated", label: "Proportion Vaccinated", type: "slider", value: 0.85, min: 0, max: 1, step: 0.01, section: "main",
+  { key: "propVaccinated", label: "Vaccinated", type: "slider", value: 0.85, min: 0, max: 1, step: 0.01, format: "percent", section: "main",
     tooltip: "Proportion of people who are vaccinated against measles" },
-  { key: "ndays", label: "Simulation Time (Days)", type: "number", value: 100, min: 0, max: 1000, step: 1, integer: true, section: "main",
+  { key: "ndays", label: "Simulation time", type: "number", unit: "days", value: 100, min: 0, max: 1000, step: 1, integer: true, section: "main",
     tooltip: "# of days to run the simulation" },
 
-  { key: "quarantineWillingness", label: "Quarantine Willingness", type: "slider", value: 1, min: 0, max: 1, step: 0.01, section: "quarantine",
+  { key: "quarantineWillingness", label: "Quarantine willingness", type: "slider", value: 1, min: 0, max: 1, step: 0.01, format: "percent", section: "quarantine",
     tooltip: "How willing people are to stay home when asked to quarantine (1 = 100% willing, 0 = 0% willing)" },
-  { key: "daysUndetected", label: "Days Undetected", type: "number", value: 2, min: 0, max: 60, step: 0.5, section: "quarantine",
+  { key: "daysUndetected", label: "Days undetected", type: "number", unit: "days", value: 2, min: 0, max: 60, step: 0.5, section: "quarantine",
     tooltip: "Average # of days after the rash manifests before a person is detected as infected with measles" },
-  { key: "quarantineDays", label: "Quarantine Days", type: "number", value: 21, min: 0, max: 60, step: 1, integer: true, section: "quarantine",
+  { key: "quarantineDays", label: "Quarantine length", type: "number", unit: "days", value: 21, min: 0, max: 60, step: 1, integer: true, section: "quarantine",
     tooltip: "# of days after potential exposure a quarantined person will stay home, if willing. This is a fixed value, not an average, and is the same for all quarantined individuals. 21 days is the CDC recommendation for measles quarantine." },
-  { key: "isolationDays", label: "Isolation Days", type: "number", value: 4, min: 0, max: 60, step: 1, integer: true, section: "quarantine",
+  { key: "isolationDays", label: "Isolation length", type: "number", unit: "days", value: 4, min: 0, max: 60, step: 1, integer: true, section: "quarantine",
     tooltip: "# of days an infected person is isolated after rash is detected. This is a fixed value, not an average, and is the same for all isolated individuals." },
 
-  { key: "r0", label: "Basic reproductive number (R0)", type: "number", value: 15, min: 0, max: 40, step: 0.5, section: "advanced",
+  { key: "r0", label: "R0 (basic reproductive number)", type: "number", value: 15, min: 0, max: 40, step: 0.5, section: "advanced",
     tooltip: "Average # of people one case infects in a fully susceptible population. Measles is usually quoted at 12–18. The contact rate is calibrated to match this value given the transmission probability and the infectious period." },
-  { key: "hospitalizationDuration", label: "Hospitalization Duration (days)", type: "number", value: 7, min: 1, max: 60, step: 1, section: "advanced",
+  { key: "hospitalizationDuration", label: "Hospitalization duration", type: "number", unit: "days", value: 7, min: 1, max: 60, step: 1, section: "advanced",
     tooltip: "Average # of days an infected person is hospitalized" },
-  { key: "nsims", label: "Number of simulations", type: "number", value: 200, min: 1, max: 1000, step: 1, integer: true, section: "advanced",
+  { key: "nsims", label: "Simulations", type: "number", value: 200, min: 1, max: 1000, step: 1, integer: true, section: "advanced",
     tooltip: "# of simulations to run - displayed results are summarized across all simulations" },
-  { key: "hospitalizationRate", label: "Hospitalization Rate", type: "slider", value: 0.2, min: 0, max: 1, step: 0.01, section: "advanced",
+  { key: "hospitalizationRate", label: "Hospitalization rate", type: "slider", value: 0.2, min: 0, max: 1, step: 0.01, format: "percent", section: "advanced",
     tooltip: "Probability that a person with rash is hospitalized" },
-  { key: "transmissionRate", label: "Transmission probability", type: "slider", value: 0.99, min: 0.01, max: 1, step: 0.01, section: "advanced",
+  { key: "transmissionRate", label: "Transmission probability", type: "slider", value: 0.99, min: 0.01, max: 1, step: 0.01, format: "percent", section: "advanced",
     tooltip: "The chance an infected individual transmits the disease to a contacted susceptible individual" },
-  { key: "vaxEfficacy", label: "Vaccination Efficacy", type: "slider", value: 0.97, min: 0, max: 1, step: 0.01, section: "advanced",
+  { key: "vaxEfficacy", label: "Vaccine efficacy", type: "slider", value: 0.97, min: 0, max: 1, step: 0.01, format: "percent", section: "advanced",
     tooltip: "How effective the vaccine is at preventing infection" },
-  { key: "incubationDays", label: "Incubation Days", type: "number", value: 12, min: 1, max: 60, step: 1, section: "advanced",
+  { key: "incubationDays", label: "Incubation period", type: "number", unit: "days", value: 12, min: 1, max: 60, step: 1, section: "advanced",
     tooltip: "Average # of days the disease incubates before the individual becomes symptomatic" },
-  { key: "prodromalPeriod", label: "Prodromal Period (days)", type: "number", value: 4, min: 1, max: 60, step: 1, section: "advanced",
+  { key: "prodromalPeriod", label: "Prodromal period", type: "number", unit: "days", value: 4, min: 1, max: 60, step: 1, section: "advanced",
     tooltip: "Average # of days the prodromal (infectious, pre-rash) period lasts before the individual develops a rash" },
-  { key: "rashPeriod", label: "Rash Period (days)", type: "number", value: 3, min: 1, max: 60, step: 1, section: "advanced",
+  { key: "rashPeriod", label: "Rash period", type: "number", unit: "days", value: 3, min: 1, max: 60, step: 1, section: "advanced",
     tooltip: "Average # of days the rash lasts before the individual recovers" },
 ];
 
-const SEED = { key: "seed", label: "Seed (Optional)", type: "number", value: 2023, min: 0, step: 1, integer: true, optional: true, section: "advanced",
+const SEED = { key: "seed", label: "Random seed", type: "number", value: 2023, min: 0, step: 1, integer: true, optional: true, section: "advanced",
   tooltip: "Random seed for the simulation, use a specific seed to reproduce results" };
 
 /** Inputs of the school model (MeaslesSchool). */
 export const SCHOOL_INPUTS = [
-  { key: "populationSize", label: "Population Size", type: "number", value: 500, min: 1, max: 50000, step: 1, integer: true, section: "main",
+  { key: "populationSize", label: "Students", type: "number", value: 500, min: 1, max: 50000, step: 1, integer: true, section: "main",
     tooltip: "# of students in the school" },
   ...COMMON.map((d) => d.key === "initialCases"
     ? { ...d, tooltip: "# of students infected with measles at the start of the simulation" }
@@ -78,13 +80,13 @@ export const SCHOOL_INPUTS = [
 /** Inputs of the community model (MeaslesMixing); the population comes from the group editor. */
 export const MIXING_INPUTS = [
   ...COMMON.map((d) => d.key === "ndays" ? { ...d, value: 180 } : d),
-  { key: "isolationWillingness", label: "Isolation Willingness", type: "slider", value: 1, min: 0, max: 1, step: 0.01, section: "quarantine",
+  { key: "isolationWillingness", label: "Isolation willingness", type: "slider", value: 1, min: 0, max: 1, step: 0.01, format: "percent", section: "quarantine",
     tooltip: "Probability that a detected case complies with isolation" },
-  { key: "contactTracingSuccessRate", label: "Contact Tracing Success", type: "slider", value: 1, min: 0, max: 1, step: 0.01, section: "quarantine",
+  { key: "contactTracingSuccessRate", label: "Contact tracing success", type: "slider", value: 1, min: 0, max: 1, step: 0.01, format: "percent", section: "quarantine",
     tooltip: "Probability that a contact of a detected case is traced (and asked to quarantine)" },
-  { key: "contactTracingDaysWindow", label: "Contact Tracing Window (days)", type: "number", value: 4, min: 0, max: 30, step: 1, integer: true, section: "quarantine",
+  { key: "contactTracingDaysWindow", label: "Contact tracing window", type: "number", unit: "days", value: 4, min: 0, max: 30, step: 1, integer: true, section: "quarantine",
     tooltip: "# of days before rash detection whose contacts are traced" },
-  { key: "rashContactReduction", label: "Rash Contact Reduction", type: "slider", value: 1, min: 0, max: 1, step: 0.01, section: "advanced",
+  { key: "rashContactReduction", label: "Rash contact reduction", type: "slider", value: 1, min: 0, max: 1, step: 0.01, format: "percent", section: "advanced",
     tooltip: "How much people with rash reduce their contacts (1 = they stay home and make no contacts, 0 = no change). Lower values make the rash period infectious and raise the calibrated contact rates." },
   SEED,
 ];

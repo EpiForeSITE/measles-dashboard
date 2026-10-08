@@ -2,12 +2,13 @@ import { LitElement, css, html, nothing } from "lit";
 import { configure } from "../config.js";
 import { engineVersion } from "../engine.js";
 import { controls, tokens } from "../styles/theme.js";
+import { RELEASES_URL, VERSION } from "../version.js";
 import "./mixing-sim.js";
 import "./school-sim.js";
 
 const TABS = {
   school: { label: "School", tag: (d) => html`<measles-school-sim default-state=${d.defaultState ?? ""} ?hide-acknowledgements=${d.hideAcknowledgements} ?hide-description=${d.hideDescription}></measles-school-sim>` },
-  mixing: { label: "Community (mixing)", tag: (d) => html`<measles-mixing-sim preset=${d.preset ?? "default-3group"} ?hide-acknowledgements=${d.hideAcknowledgements} ?hide-description=${d.hideDescription}></measles-mixing-sim>` },
+  mixing: { label: "Community", tag: (d) => html`<measles-mixing-sim preset=${d.preset ?? "default-3group"} ?hide-acknowledgements=${d.hideAcknowledgements} ?hide-description=${d.hideDescription}></measles-mixing-sim>` },
 };
 
 /**
@@ -36,19 +37,28 @@ export class MeaslesDashboard extends LitElement {
   };
 
   static styles = [tokens, controls, css`
-    :host { display: block; background: var(--_bg); }
-    [role="tablist"] { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--_border); margin-bottom: 1rem; flex-wrap: wrap; }
-    [role="tab"] {
-      border: 1px solid transparent; border-bottom: none; border-radius: var(--_radius) var(--_radius) 0 0;
-      background: none; padding: 0.5rem 1rem; color: var(--_muted); margin-bottom: -1px;
+    :host { display: block; }
+    [role="tablist"] {
+      display: inline-flex; gap: 0.25rem; padding: 0.25rem; margin-bottom: 1.1rem;
+      background: var(--_surface-alt); border: 1px solid var(--_border); border-radius: 10px;
     }
-    [role="tab"][aria-selected="true"] { color: var(--_text); background: var(--_bg); border-color: var(--_border); font-weight: 600; }
-    footer { text-align: center; font-size: 0.8em; color: var(--_muted); margin-top: 1.5rem; }
+    [role="tab"] { border: none; background: none; padding: 0.4rem 1rem; color: var(--_muted); border-radius: 7px; font-weight: 500; }
+    [role="tab"]:hover { color: var(--_text); background: transparent; }
+    [role="tab"][aria-selected="true"] { color: var(--_text); background: var(--_surface); box-shadow: var(--_shadow); }
+    footer { text-align: center; font-size: 0.78em; color: var(--_muted); margin-top: 1.5rem; }
   `];
 
   constructor() {
     super();
     this.tabs = "school,mixing";
+    // Tabs mount on first visit (and stay mounted), so a hidden simulator
+    // does not run until someone opens it
+    this._visited = new Set();
+  }
+
+  updated() {
+    const tabs = this._tabs;
+    this._visited.add(tabs.includes(this._active) ? this._active : tabs[0]);
   }
 
   willUpdate(changed) {
@@ -84,10 +94,12 @@ export class MeaslesDashboard extends LitElement {
             aria-selected=${t === active ? "true" : "false"} tabindex=${t === active ? 0 : -1}
             @click=${() => { this._active = t; }}>${TABS[t].label}</button>`)}
         </div>` : nothing}
-      ${tabs.map((t) => html`<div role="tabpanel" id="panel-${t}" aria-labelledby="tab-${t}" ?hidden=${t !== active}>${TABS[t].tag(this)}</div>`)}
+      ${tabs.map((t) => html`<div role="tabpanel" id="panel-${t}" aria-labelledby="tab-${t}" ?hidden=${t !== active}>
+        ${this._visited.has(t) || t === active ? TABS[t].tag(this) : nothing}</div>`)}
       ${this.hideFooter ? nothing : html`<footer part="footer">
-        Measles dashboard${this._version ? html` | epiworld ${this._version.epiworld} | measles ${this._version.measles}` : nothing}
-        | <a href="https://github.com/UofUEpiBio/epiworldjs" target="_blank" rel="noopener">epiworldjs</a>
+        <a href=${RELEASES_URL} target="_blank" rel="noopener" title="Latest release on GitHub">Measles dashboard v${VERSION}</a>
+        ${this._version ? html` · epiworld ${this._version.epiworld} · measles ${this._version.measles}` : nothing}
+        · <a href="https://github.com/UofUEpiBio/epiworldjs" target="_blank" rel="noopener">epiworldjs</a>
         <br /><strong>The University of Utah</strong>
       </footer>`}
     `;

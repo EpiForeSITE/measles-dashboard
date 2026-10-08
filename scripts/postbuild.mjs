@@ -17,7 +17,7 @@ for (const file of ["LICENSE", "package.json"])
 
 for (const page of ["index.html", "embed.html"]) {
   const html = readFileSync(join(root, page), "utf8")
-    .replace('src="/src/index.js"', 'src="./measles-dashboard.js"');
+    .replaceAll('"/src/index.js"', '"./measles-dashboard.js"');
   writeFileSync(join(out, page), html);
 }
 console.log("postbuild: copied epiworldjs and pages into dist/");

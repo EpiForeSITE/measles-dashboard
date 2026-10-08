@@ -49,3 +49,13 @@ test("default thresholds", () => {
     expect(Math.max(...t)).toBeLessThanOrEqual(n * 0.2);
   }
 });
+
+test("exceedance curve: P(size >= x) at every change", async () => {
+  const { exceedanceCurve, exceedanceAt } = await import("../../src/analysis.js");
+  const curve = exceedanceCurve([1, 1, 3, 10]);
+  expect(curve).toEqual([{ x: 1, p: 1 }, { x: 3, p: 0.5 }, { x: 10, p: 0.25 }, { x: 11, p: 0 }]);
+  expect(exceedanceAt(curve, 2)).toBe(1);
+  expect(exceedanceAt(curve, 5)).toBe(0.5);
+  expect(exceedanceAt(curve, 10)).toBe(0.25);
+  expect(exceedanceAt(curve, 50)).toBe(0);
+});

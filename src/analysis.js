@@ -93,13 +93,14 @@ export function formatProbability(p) {
 }
 
 /**
- * Active cases per day across simulations: median and 95% interval, with
- * days a simulation did not record counted as 0 (aggregate_active_cases).
+ * Active cases per day across simulations: median, 50% and 95% intervals,
+ * with days a simulation did not record counted as 0
+ * (aggregate_active_cases).
  *
  * @param {{sim_id: ArrayLike<number>, date: ArrayLike<number>, active_cases: ArrayLike<number>}} table
  * @param {number} nsims
  * @param {number} ndays
- * @returns {{day: number, median: number, lower: number, upper: number}[]}
+ * @returns {{day: number, median: number, lower: number, upper: number, q25: number, q75: number}[]}
  */
 export function activeCasesBand(table, nsims, ndays) {
   const values = Array.from({ length: ndays + 1 }, () => new Float64Array(nsims));
@@ -109,8 +110,44 @@ export function activeCasesBand(table, nsims, ndays) {
   }
   return values.map((v, day) => {
     const sorted = v.sort();
-    return { day, median: quantile(sorted, 0.5), lower: quantile(sorted, 0.025), upper: quantile(sorted, 0.975) };
+    return {
+      day,
+      median: quantile(sorted, 0.5),
+      lower: quantile(sorted, 0.025),
+      upper: quantile(sorted, 0.975),
+      q25: quantile(sorted, 0.25),
+      q75: quantile(sorted, 0.75),
+    };
   });
+}
+
+/**
+ * Probability that the final outbreak size reaches at least x, for every x
+ * where it changes: [{x, p}] with x increasing from 1 and p decreasing.
+ *
+ * @param {ArrayLike<number>} sizes Final outbreak sizes.
+ * @returns {{x: number, p: number}[]}
+ */
+export function exceedanceCurve(sizes) {
+  const sorted = Float64Array.from(sizes).sort();
+  const n = sorted.length;
+  const out = [{ x: 1, p: n ? sorted.filter((s) => s >= 1).length / n : NaN }];
+  for (let i = 0; i < n; i++) {
+    if (sorted[i] > 1 && sorted[i] !== sorted[i - 1]) out.push({ x: sorted[i], p: (n - i) / n });
+  }
+  // Ends at zero just past the largest outbreak
+  if (n) out.push({ x: sorted[n - 1] + 1, p: 0 });
+  return out;
+}
+
+/** Probability that the outbreak reaches at least x, read off an exceedance curve. */
+export function exceedanceAt(curve, x) {
+  let p = curve.length ? curve[0].p : NaN;
+  for (const point of curve) {
+    if (point.x > x) break;
+    p = point.p;
+  }
+  return p;
 }
 
 /**
@@ -131,6 +168,7 @@ export function summarizeScenario(result) {
     outbreak: describe(sizes),
     hosp: describe(hosp),
     curve: activeCasesBand(result.tables.active_cases, nsims, ndays),
+    exceedance: exceedanceCurve(sizes),
   };
 }
 

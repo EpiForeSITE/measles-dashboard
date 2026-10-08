@@ -1,0 +1,44 @@
+name: PR preview
+
+# Builds the static site and posts a link to it (as a downloadable
+# artifact) in the pull request. Later pushes update the same comment.
+
+on:
+  pull_request:
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measles-dashboard-site
+          path: dist
+          retention-days: 30
+
+      - name: Post the preview in the PR
+        uses: CDCgov/cfa-actions/post-artifact@v1.7.0
+        with:
+          artifact-name: measles-dashboard-site
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            :package: A build of the static site for this PR (commit ${{ github.event.pull_request.head.sha }}) is ready: [download { artifact-name }]({ artifact-url }).
+
+            To view it, unzip and serve the folder over HTTP (the simulator uses ES modules, Web Workers and WebAssembly, so opening `index.html` from disk does not work):
+
+            ```sh
+            unzip measles-dashboard-site.zip -d measles-dashboard-site
+            python3 -m http.server -d measles-dashboard-site 8000   # then open http://localhost:8000
+            ```

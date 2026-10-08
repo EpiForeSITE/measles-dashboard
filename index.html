@@ -8,21 +8,25 @@
   <meta name="description" content="Simulate measles outbreaks in schools and communities, with and without quarantine. Runs entirely in your browser." />
   <style>
     :root { color-scheme: light; }
-    body { margin: 0; background: #f8f9fa; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #212529; }
-    header { background: #fff; border-bottom: 1px solid #dee2e6; padding: 0.75rem 1rem; display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
-    header h1 { font-size: 1.25rem; margin: 0; }
+    body { margin: 0; background: #f6f7f9; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #1d2433; }
+    header { background: #fff; border-bottom: 1px solid #e3e6eb; padding: 0.8rem max(1rem, calc((100vw - 1400px) / 2 + 1rem)); display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; margin: 0; letter-spacing: -0.01em; }
+    .version { font-size: 0.75rem; font-weight: 600; color: #2f5fd0; background: #eef2fc; border: 1px solid #d8e1f8; border-radius: 999px; padding: 0.1rem 0.5rem; text-decoration: none; font-variant-numeric: tabular-nums; }
+    .version:hover { background: #e2e9fa; }
+    .version:empty { display: none; }
     header span { color: #6c757d; font-size: 0.85rem; }
     header nav { margin-left: auto; font-size: 0.9rem; display: flex; gap: 1rem; }
-    header nav a { color: #0d6efd; text-decoration: none; }
-    main { max-width: 1400px; margin: 0 auto; padding: 1rem; }
-    measles-dashboard { --md-background: #f8f9fa; }
+    header nav a { color: #5f6b7a; text-decoration: none; }
+    header nav a:hover { color: #1d2433; }
+    main { max-width: 1400px; margin: 0 auto; padding: 1.25rem 1rem 2rem; }
     measles-dashboard:not(:defined) { display: block; min-height: 60vh; }
   </style>
   <script type="module" src="/src/index.js"></script>
 </head>
 <body>
   <header>
-    <h1>Measles Outbreak Simulator</h1><span>(beta)</span>
+    <h1>Measles Outbreak Simulator</h1>
+    <a id="version" class="version" href="https://github.com/EpiForeSITE/measles-dashboard/releases/latest" title="Latest release on GitHub"></a>
     <nav>
       <a href="https://github.com/UofUEpiBio/epiworldjs">epiworldjs</a>
       <a href="https://github.com/UofUEpiBio/epiworldRShiny">epiworldRShiny</a>
@@ -32,5 +36,11 @@
   <main>
     <measles-dashboard></measles-dashboard>
   </main>
+  <script type="module">
+    import { VERSION, RELEASES_URL } from "/src/index.js";
+    const badge = document.getElementById("version");
+    badge.textContent = `v${VERSION}`;
+    badge.href = RELEASES_URL;
+  </script>
 </body>
 </html>
