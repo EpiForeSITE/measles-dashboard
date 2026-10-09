@@ -5,6 +5,7 @@ import { runAll } from "../engine.js";
 import { defaults, validate } from "../params.js";
 import { controls, layout, tokens } from "../styles/theme.js";
 import "./param-input.js";
+import "./parameters-table.js";
 import "./results-panel.js";
 
 /** Debounce between an input change and the run it triggers. */
@@ -242,6 +243,8 @@ export class SimBase extends LitElement {
   lede() { return ""; }
   /** Body of the "About this model" disclosure. */
   renderAbout() { return nothing; }
+  /** Rows of data/parameters.json to show under the description: "school" or "community". */
+  get parametersModel() { return ""; }
   renderBeforeResults() { return nothing; }
   thresholds() { return undefined; }
   get filename() { return "measles-simulations.csv"; }
@@ -290,7 +293,8 @@ export class SimBase extends LitElement {
           ${this.hideDescription ? nothing : html`
             <details class="about" part="about">
               <summary>About this model</summary>
-              <div class="card" part="card description" style="margin-top:0.5rem"><div class="card-body">${this.renderAbout()}</div></div>
+              <div class="card" part="card description" style="margin-top:0.5rem"><div class="card-body">${this.renderAbout()}
+                <md-parameters exportparts="assumptions" model=${this.parametersModel}></md-parameters></div></div>
             </details>`}
           ${this.renderBeforeResults()}
           ${this._error ? html`<div class="alert-warning" role="alert"><strong>Error:</strong> ${this._error}</div>` : nothing}

@@ -40,6 +40,8 @@ export class MixingSim extends SimBase {
 
   get heading() { return "Measles in a community"; }
 
+  get parametersModel() { return "community"; }
+
   get _n() {
     return this._population?.groups.reduce((a, g) => a + g.size, 0) ?? 0;
   }

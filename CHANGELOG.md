@@ -4,7 +4,21 @@ All notable changes to this project are documented here. The project follows
 [semantic versioning](https://semver.org/); releases are published on
 [GitHub](https://github.com/EpiForeSITE/measles-dashboard/releases).
 
-## 0.1.0 (unreleased)
+## 0.2.0 (unreleased)
+
+- "Model assumptions & references": a disclosure, closed by default, at the
+  end of each model's description. It lists every parameter (inputs and fixed
+  values), the value used and its source. It is built from the
+  package's canonical table by `npm run parameters`
+  (`scripts/sync-parameters.mjs` → `public/data/parameters.json`); see
+  EpiForeSITE/measles#5.
+- Input tooltips end with a short source.
+- The hospitalization tooltip now says it is a daily rate, not a probability
+  (with a 3-day rash, 20% a day is about a 37.5% chance).
+- The school model's "Model" link pointed to the archived epiworld-measles
+  repository; it now points to the measles package's parameter table.
+
+## 0.1.0
 
 First release.
 

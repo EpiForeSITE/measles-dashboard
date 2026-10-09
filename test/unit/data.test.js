@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
 import { parseSchoolCSV, uploadedSchools, validatePopulation } from "../../src/data.js";
 import { parseCSV } from "../../src/csv.js";
+import { MIXING_INPUTS, SCHOOL_INPUTS } from "../../src/params.js";
 
 const dir = new URL("../../public/data/", import.meta.url);
 const json = (p) => JSON.parse(readFileSync(new URL(p, dir), "utf8"));
@@ -75,4 +76,23 @@ test("searchSchools matches every word in name or county, accent-insensitive", a
   expect(searchSchools(schools, "adele young")).toHaveLength(1);
   expect(searchSchools(schools, "jose box")).toHaveLength(1);
   expect(searchSchools(schools, "")).toHaveLength(3);
+});
+
+test("parameters.json lists every input with its current default", () => {
+  // Rerun `npm run parameters` when this fails after changing src/params.js
+  const { parameters } = json("parameters.json");
+  for (const [model, inputs] of [["school", SCHOOL_INPUTS], ["community", MIXING_INPUTS]]) {
+    const rows = parameters.filter((r) => r.value[model] !== undefined);
+    for (const d of inputs) {
+      if (d.key === "populationSize") continue; // its own row, shared with the community's groups
+      const row = rows.find((r) => r.input === d.key);
+      expect(row, d.key).toBeDefined();
+      expect(row.value[model].split(" ")[0], d.key).toBe(String(d.value));
+    }
+  }
+  for (const r of parameters) {
+    expect(r.source.length, r.parameter).toBeGreaterThan(0);
+    expect(r, r.parameter).not.toHaveProperty("status");
+    expect(r, r.parameter).not.toHaveProperty("packageDefault");
+  }
 });

@@ -119,7 +119,7 @@ ancestor:
 
 For finer control, use these parts with `::part()`:
 
-- `sidebar`, `run-button` (manual mode), `accordion`, `intro`, `about`, `card`, `description`, `acknowledgements`, `population`, `school-chip`
+- `sidebar`, `run-button` (manual mode), `accordion`, `intro`, `about`, `card`, `description`, `assumptions`, `acknowledgements`, `population`, `school-chip`
 - Results: `tile`, `tile-without`, `tile-with`, `tile-impact`, `download-button`
 - On the dashboard: `tabs`, `tab`, `footer`
 
@@ -179,6 +179,15 @@ both models.
   - Adding a preset (e.g., census-based age groups for a county with an
     Epistorm contact matrix) only needs a new file and an index entry. No code
     changes.
+- **Parameters:** `public/data/parameters.json` is the table under "Model
+  assumptions & references" in each model's description: every parameter,
+  the value the dashboard uses and its source (from the measles package's
+  [canonical table](https://github.com/UofUEpiBio/measles/blob/main/inst/extdata/measles_parameters.csv)).
+  `npm run parameters` rebuilds it with `scripts/sync-parameters.mjs`, from
+  the package's canonical CSV (or a local copy passed as an argument) and the
+  defaults in `src/params.js`. Run it after changing a default or when the
+  package's table changes; a unit test fails if the file is out of date with
+  `src/params.js`.
 
 ## Tests
 
