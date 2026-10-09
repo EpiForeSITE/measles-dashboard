@@ -8,8 +8,8 @@ All notable changes to this project are documented here. The project follows
 
 - "Model assumptions & references": a disclosure, closed by default, at the
   end of each model's description. It lists every parameter (inputs and fixed
-  values), the value used, the measles package's default, the source, its
-  verification status and why the dashboard differs. It is built from the
+  values), the value used, the measles package's default, the source and
+  why the dashboard differs. It is built from the
   package's canonical table by `npm run parameters`
   (`scripts/sync-parameters.mjs` → `public/data/parameters.json`); see
   EpiForeSITE/measles#5.

@@ -13,7 +13,6 @@
       "packageDefault": "15",
       "source": "Guerra et al. 2017, Lancet Infect Dis 17(12):e420-e428",
       "url": "https://doi.org/10.1016/S1473-3099(17)30307-9",
-      "status": "✅ 🗣️",
       "notes": "Input. The contact rate (school) or contact matrix (community) is calibrated so the model has this R0 (src/r0.js)."
     },
     {
@@ -26,7 +25,6 @@
       "packageDefault": "1 - 1/15",
       "source": "Derived: 1 - 1/R0 with R0 = 15",
       "url": "",
-      "status": "🗣️",
       "notes": "Derived from R0 and shown under the R0 input; not a model parameter. The package uses it as the school model's default coverage; the dashboard does not."
     },
     {
@@ -39,7 +37,6 @@
       "packageDefault": "None",
       "source": "Scenario input",
       "url": "",
-      "status": "🗣️",
       "notes": "School: the Students input (default 500, as in epiworldRShiny). Community: the groups of the population editor."
     },
     {
@@ -52,7 +49,6 @@
       "packageDefault": "1",
       "source": "Scenario-specific input",
       "url": "",
-      "status": "🗣️",
       "notes": "Input. Entered as a number of cases and converted to the model's prevalence."
     },
     {
@@ -65,7 +61,6 @@
       "packageDefault": "1 - 1/15",
       "source": "Scenario input; school coverage from epiENGAGE and Utah DHHS",
       "url": "",
-      "status": "🗣️",
       "notes": "Differs from the package (1 − 1/15 ≈ 0.93): the default of 0.85 is kept from epiworldRShiny's measles app and is below the herd-immunity threshold. Selecting a school replaces it with that school's reported coverage."
     },
     {
@@ -78,7 +73,6 @@
       "packageDefault": "0.9",
       "source": "Assumption: highly transmissible (epiworldRShiny default). Utah DHHS Measles Disease Plan: \"90% of susceptible contacts will develop disease\"",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "🗣️",
       "notes": "Differs from the package (0.9): 0.99 is kept from epiworldRShiny's measles app. It is fixed high and the contacts are calibrated to R0, so R0 stays at 15 either way; the value only shifts the split between contacts and per-contact transmission."
     },
     {
@@ -90,7 +84,6 @@
       "packageDefault": "15 / transmission_rate / prodromal_period contacts per day",
       "source": "Calibrated to the target R0 = 15",
       "url": "",
-      "status": "🗣️",
       "notes": "Not an input: R0 / (transmission × prodromal period) = 15 / (0.99 × 4), the epiworldRShiny default. With the package's transmission of 0.9 it would be 4.17."
     },
     {
@@ -102,7 +95,6 @@
       "packageDefault": "None",
       "source": "Calibrated to the target R0 with the next-generation-matrix method (Diekmann et al. 2010, J R Soc Interface 7(47):873-885)",
       "url": "https://doi.org/10.1098/rsif.2009.0386",
-      "status": "🗣️",
       "notes": "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) / (1/rash + hospitalization rate). Scaling can be turned off."
     },
     {
@@ -114,7 +106,6 @@
       "packageDefault": "1",
       "source": "Assumption",
       "url": "",
-      "status": "🗣️",
       "notes": ""
     },
     {
@@ -127,7 +118,6 @@
       "packageDefault": "12 days",
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026): exposure to prodrome averages 8-12 days",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "✅",
       "notes": ""
     },
     {
@@ -140,7 +130,6 @@
       "packageDefault": "4 days",
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026): prodrome lasts 2-4 days (range 2-8); contagious 4 days before rash onset",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "✅",
       "notes": ""
     },
     {
@@ -153,7 +142,6 @@
       "packageDefault": "3 days",
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026): contagious to 4 days after rash onset; infectivity minimal after day 2 of rash",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "✅",
       "notes": "The visible rash lasts 6-7 days; the model only tracks the infectious part."
     },
     {
@@ -166,7 +154,6 @@
       "packageDefault": "0.97",
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026) (\"~97%\"); CDC",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "✅",
       "notes": "Earlier versions used 0.99 (Liu et al. 2015, BMC Public Health 15:447, https://doi.org/10.1186/s12889-015-1766-6)."
     },
     {
@@ -179,7 +166,6 @@
       "packageDefault": "0.2 per day",
       "source": "Started at 20% as a conservative value agreed with Utah DHHS. Recent analyses use 10%, per Jones et al. 2026, NEJM Evid 5(8): 8% overall, 9% among unvaccinated in Utah",
       "url": "https://doi.org/10.1056/EVIDpha2600141",
-      "status": "✅ 🗣️",
       "notes": "A daily rate, not a probability. With a 3-day rash, p = h / (h + 1/rash) = 0.2 / (0.2 + 1/3) ≈ 0.375 (37.5%)."
     },
     {
@@ -192,7 +178,6 @@
       "packageDefault": "7 days",
       "source": "Assumption",
       "url": "",
-      "status": "🗣️",
       "notes": "Observed stays are shorter: in Utah, a mean of 2.1 nights (range 0-7) (Jones et al. 2026); in West Texas, a median of 2 days (range 0-20) (Wang et al. 2026)."
     },
     {
@@ -205,7 +190,6 @@
       "packageDefault": "2 days",
       "source": "Assumption: about 2 days from active case to public health notification",
       "url": "",
-      "status": "🗣️",
       "notes": ""
     },
     {
@@ -218,7 +202,6 @@
       "packageDefault": "21 days",
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026): 21 days since last exposure",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "✅",
       "notes": "Used by the \"with quarantine\" scenario; the \"without quarantine\" scenario turns quarantine off."
     },
     {
@@ -231,7 +214,6 @@
       "packageDefault": "1",
       "source": "Assumption (field experience)",
       "url": "",
-      "status": "🗣️",
       "notes": "Some analyses use 0.9."
     },
     {
@@ -244,7 +226,6 @@
       "packageDefault": "4 days",
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026): isolate until 4 days after rash onset",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "✅",
       "notes": ""
     },
     {
@@ -256,7 +237,6 @@
       "packageDefault": "1",
       "source": "Assumption (field experience)",
       "url": "",
-      "status": "🗣️",
       "notes": "Some analyses use 0.9."
     },
     {
@@ -268,7 +248,6 @@
       "packageDefault": "1",
       "source": "Assumption (field experience)",
       "url": "",
-      "status": "🗣️",
       "notes": "Some analyses use 0.8."
     },
     {
@@ -280,7 +259,6 @@
       "packageDefault": "4 days",
       "source": "Assumption (field experience); matches the Utah DHHS Measles Disease Plan (updated March 26, 2026) exposure definition: 4 days before through 4 days after rash onset",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
-      "status": "🗣️ ✅",
       "notes": ""
     },
     {
@@ -292,7 +270,6 @@
       "packageDefault": "0.5",
       "source": "Not active",
       "url": "",
-      "status": "✅",
       "notes": "Registered by the C++ model as \"(IGNORED) Vax improved recovery\"; it has no effect on the simulation. ModelMeaslesSchool() no longer takes it."
     },
     {
@@ -305,7 +282,6 @@
       "packageDefault": "",
       "source": "Dashboard setting",
       "url": "",
-      "status": "🗣️",
       "notes": "Simulation setting, not an epidemiological parameter."
     },
     {
@@ -318,7 +294,6 @@
       "packageDefault": "",
       "source": "Dashboard setting",
       "url": "",
-      "status": "🗣️",
       "notes": "Simulation setting, not an epidemiological parameter."
     },
     {
@@ -331,7 +306,6 @@
       "packageDefault": "",
       "source": "Dashboard setting",
       "url": "",
-      "status": "🗣️",
       "notes": "Simulation setting, not an epidemiological parameter."
     }
   ]

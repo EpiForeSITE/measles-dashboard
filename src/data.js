@@ -148,7 +148,6 @@ export async function loadPopulation(file) {
  * @property {string} packageDefault
  * @property {string} source
  * @property {string} url
- * @property {string} status ✅, 🗣️ and/or ⚠️.
  * @property {string} notes
  */
 

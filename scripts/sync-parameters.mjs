@@ -3,7 +3,7 @@
 // of the measles R package (inst/extdata/measles_parameters.csv) and the
 // dashboard's own values:
 //
-//   - Sources, statuses and package defaults come from the CSV.
+//   - Sources and package defaults come from the CSV.
 //   - Values come from the input defaults in src/params.js, the R0
 //     calibration in src/r0.js and the default population preset, so they
 //     cannot drift from what the dashboard runs.
@@ -39,7 +39,7 @@ const text = /^https?:/.test(input)
   })
   : readFileSync(input, "utf8");
 const { columns, records } = parseCSVRecords(text);
-for (const c of ["parameter", "default", "units", "citation", "doi_or_url", "status", "notes"])
+for (const c of ["parameter", "default", "units", "citation", "doi_or_url", "notes"])
   if (!columns.includes(c)) throw new Error(`Missing column "${c}" in ${input}`);
 const canonical = new Map(records.map((r) => [r.parameter, r]));
 
@@ -56,7 +56,7 @@ const presetSize = preset.groups.reduce((a, g) => a + g.size, 0);
 const contactRate = schoolContactRate(school("r0"), school("transmissionRate"), school("prodromalPeriod"));
 
 const BOTH = ["school", "community"];
-const DASHBOARD_SETTING = { source: "Dashboard setting", status: "🗣️", notes: "Simulation setting, not an epidemiological parameter." };
+const DASHBOARD_SETTING = { source: "Dashboard setting", notes: "Simulation setting, not an epidemiological parameter." };
 
 /**
  * One row per parameter, in display order.
@@ -64,7 +64,7 @@ const DASHBOARD_SETTING = { source: "Dashboard setting", status: "🗣️", note
  * label: the dashboard's name. canonical: the CSV's `parameter`, if any.
  * input: the key in src/params.js, when it is an input (its default is the
  * value). value: {model: text} for values that are not input defaults.
- * unit: overrides the input's unit. source/url/status/notes override the CSV.
+ * unit: overrides the input's unit. source/url/notes override the CSV.
  */
 const ROWS = [
   { label: "R0 (basic reproductive number)", canonical: "R0", input: "r0", models: BOTH,
@@ -83,7 +83,6 @@ const ROWS = [
     notes: "Differs from the package (1 − 1/15 ≈ 0.93): the default of 0.85 is kept from epiworldRShiny's measles app and is below the herd-immunity threshold. Selecting a school replaces it with that school's reported coverage." },
   { label: "Transmission probability", canonical: "Transmission rate", input: "transmissionRate", models: BOTH,
     source: "Assumption: highly transmissible (epiworldRShiny default). Utah DHHS Measles Disease Plan: \"90% of susceptible contacts will develop disease\"",
-    status: "🗣️",
     notes: "Differs from the package (0.9): 0.99 is kept from epiworldRShiny's measles app. It is fixed high and the contacts are calibrated to R0, so R0 stays at 15 either way; the value only shifts the split between contacts and per-contact transmission." },
   { label: "Contact rate", canonical: "Contact rate", models: ["school"],
     value: { school: `${contactRate.toFixed(2)} contacts per day` },
@@ -137,7 +136,6 @@ const parameters = ROWS.map((row) => {
     packageDefault: packageDefault(c),
     source: row.source ?? c?.citation ?? "",
     url: row.url ?? c?.doi_or_url ?? "",
-    status: row.status ?? c?.status ?? "",
     notes: row.notes ?? c?.notes ?? "",
   };
 });
