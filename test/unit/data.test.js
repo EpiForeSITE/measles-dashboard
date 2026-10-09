@@ -93,5 +93,6 @@ test("parameters.json lists every input with its current default", () => {
   for (const r of parameters) {
     expect(r.source.length, r.parameter).toBeGreaterThan(0);
     expect(r, r.parameter).not.toHaveProperty("status");
+    expect(r, r.parameter).not.toHaveProperty("packageDefault");
   }
 });

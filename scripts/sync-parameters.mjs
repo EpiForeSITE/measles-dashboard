@@ -3,11 +3,12 @@
 // of the measles R package (inst/extdata/measles_parameters.csv) and the
 // dashboard's own values:
 //
-//   - Sources and package defaults come from the CSV.
+//   - Sources come from the CSV.
 //   - Values come from the input defaults in src/params.js, the R0
 //     calibration in src/r0.js and the default population preset, so they
 //     cannot drift from what the dashboard runs.
-//   - Notes explain where the dashboard differs from the package.
+//   - Notes add provenance (where a value comes from, what it means); the
+//     table shows them in the Source cell, after the citation.
 //
 // Rows of the CSV for models the dashboard does not run (tiered quarantine,
 // post-exposure prophylaxis) are left out.
@@ -39,7 +40,7 @@ const text = /^https?:/.test(input)
   })
   : readFileSync(input, "utf8");
 const { columns, records } = parseCSVRecords(text);
-for (const c of ["parameter", "default", "units", "citation", "doi_or_url", "notes"])
+for (const c of ["parameter", "citation", "doi_or_url", "notes"])
   if (!columns.includes(c)) throw new Error(`Missing column "${c}" in ${input}`);
 const canonical = new Map(records.map((r) => [r.parameter, r]));
 
@@ -71,7 +72,7 @@ const ROWS = [
     notes: "Input. The contact rate (school) or contact matrix (community) is calibrated so the model has this R0 (src/r0.js)." },
   { label: "Herd-immunity threshold", canonical: "Herd-immunity threshold", models: BOTH,
     value: Object.fromEntries(BOTH.map((m) => [m, `${Math.round(herdImmunityThreshold(def(m, "r0").value) * 100)}% (1 − 1/R0)`])),
-    notes: "Derived from R0 and shown under the R0 input; not a model parameter. The package uses it as the school model's default coverage; the dashboard does not." },
+    notes: "Derived from R0 and shown under the R0 input; not a model parameter." },
   { label: "Population size", canonical: "(population size)", models: BOTH,
     value: { school: `${school("populationSize")} students`, community: `${presetSize.toLocaleString("en-US")} (${preset.groups.length} groups, preset ${PRESET})` },
     source: "Scenario input",
@@ -80,13 +81,13 @@ const ROWS = [
     notes: "Input. Entered as a number of cases and converted to the model's prevalence." },
   { label: "Vaccinated", canonical: "Vaccination rate", input: "propVaccinated", models: BOTH,
     source: "Scenario input; school coverage from epiENGAGE and Utah DHHS",
-    notes: "Differs from the package (1 − 1/15 ≈ 0.93): the default of 0.85 is kept from epiworldRShiny's measles app and is below the herd-immunity threshold. Selecting a school replaces it with that school's reported coverage." },
+    notes: "The default of 0.85 is kept from epiworldRShiny's measles app. Selecting a school replaces it with that school's reported coverage." },
   { label: "Transmission probability", canonical: "Transmission rate", input: "transmissionRate", models: BOTH,
     source: "Assumption: highly transmissible (epiworldRShiny default). Utah DHHS Measles Disease Plan: \"90% of susceptible contacts will develop disease\"",
-    notes: "Differs from the package (0.9): 0.99 is kept from epiworldRShiny's measles app. It is fixed high and the contacts are calibrated to R0, so R0 stays at 15 either way; the value only shifts the split between contacts and per-contact transmission." },
+    notes: "Per contact. Fixed high; the contacts are calibrated to R0 (src/r0.js)." },
   { label: "Contact rate", canonical: "Contact rate", models: ["school"],
     value: { school: `${contactRate.toFixed(2)} contacts per day` },
-    notes: `Not an input: R0 / (transmission × prodromal period) = ${school("r0")} / (${school("transmissionRate")} × ${school("prodromalPeriod")}), the epiworldRShiny default. With the package's transmission of 0.9 it would be 4.17.` },
+    notes: `Not an input: R0 / (transmission × prodromal period) = ${school("r0")} / (${school("transmissionRate")} × ${school("prodromalPeriod")}), the epiworldRShiny default.` },
   { label: "Contact matrix", canonical: "(contact matrix)", models: ["community"],
     value: { community: `Preset ${PRESET}, scaled to R0` },
     notes: "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) / (1/rash + hospitalization rate). Scaling can be turned off." },
@@ -113,12 +114,6 @@ const ROWS = [
   { label: "Random seed", input: "seed", models: BOTH, ...DASHBOARD_SETTING },
 ];
 
-function packageDefault(c) {
-  if (!c) return "";
-  if (c.default === "") return "None";
-  return ["days", "per day", "contacts per day"].includes(c.units) ? `${c.default} ${c.units}` : c.default;
-}
-
 function value(row, model) {
   if (row.value) return row.value[model];
   const d = def(model, row.input);
@@ -133,7 +128,6 @@ const parameters = ROWS.map((row) => {
     parameter: row.label,
     input: row.input ?? null,
     value: Object.fromEntries(row.models.map((m) => [m, value(row, m)])),
-    packageDefault: packageDefault(c),
     source: row.source ?? c?.citation ?? "",
     url: row.url ?? c?.doi_or_url ?? "",
     notes: row.notes ?? c?.notes ?? "",

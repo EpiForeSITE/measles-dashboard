@@ -181,9 +181,8 @@ both models.
     changes.
 - **Parameters:** `public/data/parameters.json` is the table under "Model
   assumptions & references" in each model's description: every parameter,
-  the value the dashboard uses, the
-  [measles package's default](https://github.com/UofUEpiBio/measles/blob/main/inst/extdata/measles_parameters.csv),
-  the source and why the dashboard differs.
+  the value the dashboard uses and its source (from the measles package's
+  [canonical table](https://github.com/UofUEpiBio/measles/blob/main/inst/extdata/measles_parameters.csv)).
   `npm run parameters` rebuilds it with `scripts/sync-parameters.mjs`, from
   the package's canonical CSV (or a local copy passed as an argument) and the
   defaults in `src/params.js`. Run it after changing a default or when the

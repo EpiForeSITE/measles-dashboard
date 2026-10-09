@@ -4,8 +4,9 @@ import { tokens } from "../styles/theme.js";
 
 /**
  * "Model assumptions & references": a disclosure, closed by default, with
- * every parameter of a model, its value, the measles package's default and
- * its source. The table (data/parameters.json) is loaded when first opened.
+ * every parameter of a model, its value and its source (the citation followed
+ * by the row's notes). The table (data/parameters.json) is loaded when first
+ * opened.
  *
  * @element md-parameters
  * @attr model - "school" or "community".
@@ -25,9 +26,8 @@ export class ParametersTable extends LitElement {
     th, td { text-align: left; vertical-align: top; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--_border); }
     thead th { font-weight: 600; color: var(--_muted); white-space: nowrap; }
     td.param { font-weight: 500; min-width: 9rem; }
-    td.value, td.default { min-width: 6rem; }
-    td.source { min-width: 12rem; }
-    td.notes { min-width: 16rem; color: var(--_muted); }
+    td.value { min-width: 6rem; }
+    td.source { min-width: 16rem; }
     .tag { font-size: 0.85em; font-weight: 400; color: var(--_muted); }
     p { font-size: 0.82em; color: var(--_muted); margin: 0.5rem 0 0; }
   `];
@@ -48,18 +48,16 @@ export class ParametersTable extends LitElement {
     return html`
       <div class="wrap">
         <table>
-          <thead><tr><th>Parameter</th><th>Value used</th><th>Package default</th><th>Source</th><th>Notes / why different</th></tr></thead>
+          <thead><tr><th>Parameter</th><th>Value used</th><th>Source</th></tr></thead>
           <tbody>${rows.map((r) => html`<tr>
             <td class="param">${r.parameter}${r.input ? html` <span class="tag">(input)</span>` : nothing}</td>
             <td class="value">${r.value[this.model]}</td>
-            <td class="default">${r.packageDefault || "—"}</td>
-            <td class="source">${r.url ? html`<a href=${r.url} target="_blank" rel="noopener">${r.source}</a>` : r.source}</td>
-            <td class="notes">${r.notes}</td>
+            <td class="source">${r.url ? html`<a href=${r.url} target="_blank" rel="noopener">${r.source}</a>` : r.source}${r.notes ? `${/[.!?]$/.test(r.source) ? "" : "."} ${r.notes}` : nothing}</td>
           </tr>`)}</tbody>
         </table>
       </div>
       <p>For inputs, the value is the dashboard's default; runs use the values you set.
-        Sources and package defaults come from the
+        Sources come from the
         <a href=${this._data.table} target="_blank" rel="noopener">canonical parameter table</a> of the measles R package
         (see also <a href=${this._data.vignette} target="_blank" rel="noopener">Parameters and literature references</a>).</p>`;
   }

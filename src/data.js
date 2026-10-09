@@ -145,10 +145,9 @@ export async function loadPopulation(file) {
  * @property {string} parameter The dashboard's name.
  * @property {string | null} input Key in params.js, when it is an input.
  * @property {{school?: string, community?: string}} value Value used by each model (for inputs, the default).
- * @property {string} packageDefault
  * @property {string} source
  * @property {string} url
- * @property {string} notes
+ * @property {string} notes Provenance details, shown after the source.
  */
 
 /** @returns {Promise<{table: string, vignette: string, parameters: ParameterRow[]}>} */
