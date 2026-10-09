@@ -150,7 +150,7 @@
         "school": "0.2 per day",
         "community": "0.2 per day"
       },
-      "source": "Started at 20% as a conservative value agreed with Utah DHHS. Recent analyses use 10%, per Jones et al. 2026, NEJM Evid 5(8): 8% overall, 9% among unvaccinated in Utah",
+      "source": "Assumption: a conservative value. Recent analyses use 10%, per Jones et al. 2026, NEJM Evid 5(8): 8% overall, 9% among unvaccinated in Utah",
       "url": "https://doi.org/10.1056/EVIDpha2600141",
       "notes": "A daily rate, not a probability. With a 3-day rash, p = h / (h + 1/rash) = 0.2 / (0.2 + 1/3) ≈ 0.375 (37.5%)."
     },
@@ -194,7 +194,7 @@
         "school": "1",
         "community": "1"
       },
-      "source": "Assumption (field experience)",
+      "source": "Assumption",
       "url": "",
       "notes": "Some analyses use 0.9."
     },
@@ -215,7 +215,7 @@
       "value": {
         "community": "1"
       },
-      "source": "Assumption (field experience)",
+      "source": "Assumption",
       "url": "",
       "notes": "Some analyses use 0.9."
     },
@@ -225,7 +225,7 @@
       "value": {
         "community": "1"
       },
-      "source": "Assumption (field experience)",
+      "source": "Assumption",
       "url": "",
       "notes": "Some analyses use 0.8."
     },
@@ -235,7 +235,7 @@
       "value": {
         "community": "4 days"
       },
-      "source": "Assumption (field experience); matches the Utah DHHS Measles Disease Plan (updated March 26, 2026) exposure definition: 4 days before through 4 days after rash onset",
+      "source": "Assumption; matches the Utah DHHS Measles Disease Plan (updated March 26, 2026) exposure definition: 4 days before through 4 days after rash onset",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
       "notes": ""
     },
