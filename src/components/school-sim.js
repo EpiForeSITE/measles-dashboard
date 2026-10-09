@@ -30,6 +30,8 @@ export class SchoolSim extends SimBase {
 
   get heading() { return "Measles in a school"; }
 
+  get parametersModel() { return "school"; }
+
   buildSpecs(v) {
     return { without: schoolSpec(v, { quarantine: false }), with: schoolSpec(v, { quarantine: true }) };
   }
@@ -103,7 +105,7 @@ export class SchoolSim extends SimBase {
         households, the community) or new introductions after the initial cases, and it does not include post-exposure prophylaxis.
         For spread across a larger population, use the community model.</p>
       <p class="small muted">School vaccination data: <a href="https://github.com/TACC/measles-dashboard" target="_blank" rel="noopener">epiENGAGE</a>
-        and Utah DHHS. Model: <a href="https://github.com/EpiForeSITE/epiworld-measles" target="_blank" rel="noopener">epiworld-measles</a>.
+        and Utah DHHS. Parameter sources: <a href="https://github.com/UofUEpiBio/measles/blob/main/inst/extdata/measles_parameters.csv" target="_blank" rel="noopener">measles package reference table</a>.
         This is work in progress; feedback is welcome.</p>`;
   }
 

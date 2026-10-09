@@ -1,7 +1,8 @@
 /**
- * Data the dashboard ships with: schools (vaccination coverage) and
- * population presets for the mixing model. Both are plain JSON files under
- * `data/`, so new states or presets need no code changes.
+ * Data the dashboard ships with: schools (vaccination coverage), population
+ * presets for the mixing model, and the parameter reference table. All are
+ * plain JSON files under `data/`, so new states or presets need no code
+ * changes.
  */
 
 import { resolveAsset } from "./config.js";
@@ -133,6 +134,27 @@ export async function loadPopulation(file) {
   const errors = validatePopulation(preset);
   if (errors.length) throw new Error(`Invalid population preset ${file}: ${errors.join(" ")}`);
   return preset;
+}
+
+/**
+ * A row of the "Model assumptions & references" table
+ * (data/parameters.json, written by scripts/sync-parameters.mjs from the
+ * measles package's canonical parameter table).
+ *
+ * @typedef {object} ParameterRow
+ * @property {string} parameter The dashboard's name.
+ * @property {string | null} input Key in params.js, when it is an input.
+ * @property {{school?: string, community?: string}} value Value used by each model (for inputs, the default).
+ * @property {string} packageDefault
+ * @property {string} source
+ * @property {string} url
+ * @property {string} status ✅, 🗣️ and/or ⚠️.
+ * @property {string} notes
+ */
+
+/** @returns {Promise<{table: string, vignette: string, parameters: ParameterRow[]}>} */
+export async function loadParameters() {
+  return fetchJSON("data/parameters.json");
 }
 
 /**
