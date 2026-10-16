@@ -4,23 +4,26 @@ import { css } from "lit";
  * Design tokens. Every visual choice reads one of these custom properties,
  * so a host page can restyle the dashboard from outside, e.g.
  *
- *   measles-dashboard { --md-primary: #00629b; --md-font-family: "Inter", sans-serif; }
+ *   measles-dashboard { --md-primary: #A60F2D; --md-font-family: "Open Sans", sans-serif; }
  *
  * Custom properties inherit through shadow roots; parts (`::part(card)`,
  * `::part(sidebar)`, `::part(run-button)`, ...) allow finer overrides.
  */
 export const tokens = css`
   :host {
-    --_primary: var(--md-primary, #2f5fd0);
+    --_primary: var(--md-primary, #A60F2D);
     --_on-primary: var(--md-on-primary, #ffffff);
     --_bg: var(--md-background, #f6f7f9);
     --_surface: var(--md-surface, #ffffff);
     --_surface-alt: var(--md-surface-alt, #f1f3f6);
-    --_text: var(--md-text, #1d2433);
+    --_text: var(--md-text, #4E4E4E);
     --_muted: var(--md-text-muted, #5f6b7a);
     --_border: var(--md-border, #e3e6eb);
     --_radius: var(--md-radius, 12px);
-    --_font: var(--md-font-family, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    --_accent: var(--md-accent, #FDB921);
+    --_font: var(--md-font-family, "Open Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    --_font-heading: var(--md-font-family-heading, "Montserrat", "Open Sans", ui-sans-serif, system-ui, sans-serif);
+    --_font-mono: var(--md-font-family-mono, "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
     --_font-size: var(--md-font-size, 15px);
     --_quarantine: var(--md-color-quarantine, #307bc2);
     --_no-quarantine: var(--md-color-no-quarantine, #c11a01);
@@ -31,7 +34,7 @@ export const tokens = css`
     --_error: var(--md-error, #b02a37);
     --_sidebar-width: var(--md-sidebar-width, 320px);
     --_shadow: var(--md-shadow, 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06));
-    --_focus: color-mix(in srgb, var(--_primary) 35%, transparent);
+    --_focus: color-mix(in srgb, var(--_accent) 55%, transparent);
 
     font-family: var(--_font);
     font-size: var(--_font-size);
@@ -40,6 +43,8 @@ export const tokens = css`
   }
   :host, *, *::before, *::after { box-sizing: border-box; }
   a { color: var(--_primary); text-underline-offset: 2px; }
+  h1, h2, h3, h4 { font-family: var(--_font-heading); }
+  code, pre, kbd { font-family: var(--_font-mono); }
 `;
 
 /** Shared controls: buttons, inputs, cards, disclosures (native <details>). */

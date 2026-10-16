@@ -83,6 +83,7 @@ export class SimBase extends LitElement {
     .ack { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; font-size: 0.82em; color: var(--_muted); margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--_border); }
     .ack img { height: 40px; width: auto; }
     .ack p { margin: 0; flex: 1 1 18rem; }
+    .ack .funding { flex-basis: 100%; font-size: 0.92em; }
   `];
 
   /** @type {import("../params.js").InputDef[]} */
@@ -274,6 +275,9 @@ export class SimBase extends LitElement {
           <a href="https://github.com/UofUEpiBio/epiworldjs" target="_blank" rel="noopener">epiworldjs</a>,
           the WebAssembly build of <a href="https://github.com/UofUEpiBio/epiworld" target="_blank" rel="noopener">epiworld</a>
           and <a href="https://github.com/UofUEpiBio/measles" target="_blank" rel="noopener">measles</a>.</p>
+        <p class="funding">This project was made possible by cooperative agreement CDC-RFA-FT-23-0069 from the CDC’s
+          Center for Forecasting and Outbreak Analytics. Its contents are solely the responsibility of the authors and
+          do not necessarily represent the official views of the Centers for Disease Control and Prevention.</p>
       </footer>`;
   }
 
