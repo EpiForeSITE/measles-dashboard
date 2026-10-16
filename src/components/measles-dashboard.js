@@ -20,7 +20,7 @@ const TABS = {
  * @attr engine-url - URL of epiworldjs's src/index.js.
  * @attr default-state - State preselected in the school selector.
  * @attr preset - Population preset of the community tab.
- * @attr hide-acknowledgements, hide-description, hide-footer
+ * @attr hide-acknowledgements, hide-description, hide-footer, hide-beta-notice
  */
 export class MeaslesDashboard extends LitElement {
   static properties = {
@@ -32,6 +32,7 @@ export class MeaslesDashboard extends LitElement {
     hideAcknowledgements: { type: Boolean, attribute: "hide-acknowledgements" },
     hideDescription: { type: Boolean, attribute: "hide-description" },
     hideFooter: { type: Boolean, attribute: "hide-footer" },
+    hideBetaNotice: { type: Boolean, attribute: "hide-beta-notice" },
     _active: { state: true },
     _version: { state: true },
   };
@@ -45,6 +46,15 @@ export class MeaslesDashboard extends LitElement {
     [role="tab"] { border: none; background: none; padding: 0.4rem 1rem; color: var(--_muted); border-radius: 7px; font-weight: 500; }
     [role="tab"]:hover { color: var(--_text); background: transparent; }
     [role="tab"][aria-selected="true"] { color: var(--_text); background: var(--_surface); box-shadow: var(--_shadow); }
+    .beta {
+      display: flex; gap: 0.6rem; align-items: baseline; margin: 0 0 1rem; padding: 0.55rem 0.85rem;
+      background: var(--_surface); border: 1px solid var(--_border); border-left: 4px solid var(--_accent);
+      border-radius: 8px; font-size: 0.9em;
+    }
+    .beta strong {
+      font-family: var(--_font-heading); font-size: 0.8em; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--_primary);
+    }
     footer { text-align: center; font-size: 0.78em; color: var(--_muted); margin-top: 1.5rem; }
   `];
 
@@ -88,6 +98,11 @@ export class MeaslesDashboard extends LitElement {
     const tabs = this._tabs;
     const active = tabs.includes(this._active) ? this._active : tabs[0];
     return html`
+      ${this.hideBetaNotice ? nothing : html`<div class="beta" part="beta-notice" role="note">
+        <strong>Beta</strong>
+        <span>This is a beta version and is still under review. Results are preliminary and should not be used
+          for public health decisions.</span>
+      </div>`}
       ${tabs.length > 1 ? html`
         <div role="tablist" part="tabs" @keydown=${this._keydown}>
           ${tabs.map((t) => html`<button type="button" role="tab" id="tab-${t}" part="tab" aria-controls="panel-${t}"

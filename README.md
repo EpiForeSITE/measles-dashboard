@@ -95,6 +95,7 @@ Copy it anywhere and add the script and an element:
 | `engine-url` | all | URL of epiworldjs's `src/index.js`, e.g. `https://cdn.jsdelivr.net/npm/epiworldjs@0.18.0-0/src/index.js`. |
 | `hide-description`, `hide-acknowledgements` | all | Hide those cards. |
 | `hide-footer` | dashboard | Hide the version footer. |
+| `hide-beta-notice` | dashboard | Hide the "beta, under review" notice. |
 
 `configure({ baseUrl, engineUrl })` (exported by the bundle) does the same for
 the whole page.

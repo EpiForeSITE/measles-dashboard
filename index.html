@@ -6,18 +6,22 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%227%22 fill=%22%23c11a01%22/%3E%3Ccircle cx=%225%22 cy=%226%22 r=%221.4%22 fill=%22%23fff%22/%3E%3Ccircle cx=%2210%22 cy=%225%22 r=%221%22 fill=%22%23fff%22/%3E%3Ccircle cx=%229%22 cy=%2210.5%22 r=%221.6%22 fill=%22%23fff%22/%3E%3C/svg%3E" />
   <title>Measles Outbreak Simulator</title>
   <meta name="description" content="Simulate measles outbreaks in schools and communities, with and without quarantine. Runs entirely in your browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Montserrat:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root { color-scheme: light; }
-    body { margin: 0; background: #f6f7f9; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #1d2433; }
-    header { background: #fff; border-bottom: 1px solid #e3e6eb; padding: 0.8rem max(1rem, calc((100vw - 1400px) / 2 + 1rem)); display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
-    header h1 { font-size: 1.1rem; margin: 0; letter-spacing: -0.01em; }
-    .version { font-size: 0.75rem; font-weight: 600; color: #2f5fd0; background: #eef2fc; border: 1px solid #d8e1f8; border-radius: 999px; padding: 0.1rem 0.5rem; text-decoration: none; font-variant-numeric: tabular-nums; }
-    .version:hover { background: #e2e9fa; }
+    body { margin: 0; background: #f6f7f9; font-family: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #4E4E4E; }
+    header { background: #fff; border-bottom: 3px solid #FDB921; padding: 0.8rem max(1rem, calc((100vw - 1400px) / 2 + 1rem)); display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+    header h1 { font-family: "Montserrat", "Open Sans", system-ui, sans-serif; font-weight: 600; color: #A60F2D; font-size: 1.1rem; margin: 0; letter-spacing: -0.01em; }
+    .version { font-size: 0.75rem; font-weight: 600; color: #A60F2D; background: #fdf0f2; border: 1px solid #f0c9d1; border-radius: 999px; padding: 0.1rem 0.5rem; text-decoration: none; font-variant-numeric: tabular-nums; }
+    .version:hover { background: #fadfe4; }
     .version:empty { display: none; }
     header span { color: #6c757d; font-size: 0.85rem; }
     header nav { margin-left: auto; font-size: 0.9rem; display: flex; gap: 1rem; }
-    header nav a { color: #5f6b7a; text-decoration: none; }
-    header nav a:hover { color: #1d2433; }
+    header nav a { color: #4E4E4E; text-decoration: none; }
+    header nav a:hover { color: #A60F2D; }
+    .beta-tag { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #4E4E4E; background: #FDB921; border-radius: 999px; padding: 0.1rem 0.5rem; }
     main { max-width: 1400px; margin: 0 auto; padding: 1.25rem 1rem 2rem; }
     measles-dashboard:not(:defined) { display: block; min-height: 60vh; }
   </style>
@@ -27,6 +31,7 @@
   <header>
     <h1>Measles Outbreak Simulator</h1>
     <a id="version" class="version" href="https://github.com/EpiForeSITE/measles-dashboard/releases/latest" title="Latest release on GitHub"></a>
+    <span class="beta-tag">Beta</span>
     <nav>
       <a href="https://github.com/UofUEpiBio/epiworldjs">epiworldjs</a>
       <a href="https://github.com/UofUEpiBio/epiworldRShiny">epiworldRShiny</a>
