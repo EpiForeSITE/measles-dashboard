@@ -1,6 +1,6 @@
 {
   "name": "measles-dashboard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Static, embeddable measles outbreak dashboard powered by epiworldjs (WebAssembly).",
   "type": "module",
   "license": "MIT",

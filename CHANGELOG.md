@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The project follows
 [semantic versioning](https://semver.org/); releases are published on
 [GitHub](https://github.com/EpiForeSITE/measles-dashboard/releases).
 
-## 0.2.0 (unreleased)
+## 0.3.0 (unreleased)
 
 - Uses epiworldjs 0.19.0-1, with the measles models' lognormal stage
   durations (UofUEpiBio/measles#69). The incubation, prodromal and rash
@@ -19,6 +19,9 @@ All notable changes to this project are documented here. The project follows
   probability; the tooltip and the parameter table give the conversion.
 - The community model's R0 calibration uses the expected days with rash
   under these rules (`mixingInfectiousPeriod()` in `src/r0.js`).
+
+## 0.2.0
+
 - "Model assumptions & references": a disclosure, closed by default, at the
   end of each model's description. It lists every parameter (inputs and fixed
   values), the value used and its source. It is built from the
