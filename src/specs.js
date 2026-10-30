@@ -20,6 +20,9 @@ function diseaseParams(v, quarantine) {
     "Incubation period": v.incubationDays,
     "Prodromal period": v.prodromalPeriod,
     "Rash period": v.rashPeriod,
+    "Incubation period sd": v.incubationSd,
+    "Prodromal period sd": v.prodromalSd,
+    "Rash period sd": v.rashSd,
     "Hospitalization rate": v.hospitalizationRate,
     "Hospitalization period": v.hospitalizationDuration,
     "Days undetected": v.daysUndetected,
@@ -69,7 +72,7 @@ export function schoolSpec(v, { quarantine }) {
  */
 export function mixingMatrix(v, population, calibrate = true) {
   if (!calibrate) return population.contact_matrix;
-  const period = mixingInfectiousPeriod(v.prodromalPeriod, v.rashPeriod, v.rashContactReduction, v.hospitalizationRate);
+  const period = mixingInfectiousPeriod(v);
   return calibrateMatrix(population.contact_matrix, v.r0, v.transmissionRate, period).matrix;
 }
 

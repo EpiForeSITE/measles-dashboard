@@ -84,7 +84,7 @@ export class MixingSim extends SimBase {
 
   _period() {
     const v = this.values;
-    return mixingInfectiousPeriod(v.prodromalPeriod, v.rashPeriod, v.rashContactReduction, v.hospitalizationRate);
+    return mixingInfectiousPeriod(v);
   }
 
   _impliedR0() {

@@ -9,10 +9,12 @@
  * MeaslesMixing: a susceptible agent in group i contacts each infectious
  * agent in group j with probability C[i][j] / N_j. Agents with rash are
  * infectious too, with contacts scaled by r = 1 − "Rash reduction contact
- * rate". Each day an agent with rash recovers (probability 1 / rash period)
- * or is hospitalized (the hospitalization rate), so it spends on average
- * 1 / (1 / rash + h) days with rash, and the expected infectious period is
- * D = prodromal + r / (1 / rash + h). The
+ * rate". Stages last a lognormal number of days (see stagePmf()). Each day
+ * with rash, an agent is hospitalized with probability h (the hospitalization
+ * rate); otherwise it recovers when its rash period R ends. So it is still
+ * in rash on day k if R ≥ k and it was not hospitalized before, and the
+ * expected infectious period is D = E[prodromal] + r Σ_k P(R ≥ k) (1 − h)^(k − 1).
+ * The
  * next-generation matrix is K[i][j] = p × D × C[i][j] × N_i / N_j, which is
  * similar to p × D × C, hence
  *
@@ -40,20 +42,67 @@ export function schoolR0(contactRate, transmissionRate, prodromalPeriod) {
   return contactRate * transmissionRate * prodromalPeriod;
 }
 
+/** Standard normal CDF (erf by Abramowitz & Stegun 7.1.26, error < 1.5e-7). */
+function normalCdf(x) {
+  const z = Math.abs(x) / Math.SQRT2;
+  const t = 1 / (1 + 0.3275911 * z);
+  const erf = 1 - t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-z * z);
+  return x >= 0 ? (1 + erf) / 2 : (1 - erf) / 2;
+}
+
+/**
+ * Probability that a measles stage lasts d days, d = 1, ..., dmax (entry
+ * d − 1), as the measles models draw it: a lognormal with this mean and sd
+ * (in days), rounded to whole days with a minimum of one. An sd of 0 is a
+ * fixed duration.
+ *
+ * @param {number} mean
+ * @param {number} sd
+ * @param {number} [dmax]
+ * @returns {number[]}
+ */
+export function stagePmf(mean, sd, dmax = 200) {
+  const pmf = new Array(dmax).fill(0);
+  if (!(sd > 0) || !(mean > 0)) {
+    pmf[Math.max(1, Math.round(mean)) - 1] = 1;
+    return pmf;
+  }
+  const s2 = Math.log(1 + (sd * sd) / (mean * mean));
+  const mu = Math.log(mean) - s2 / 2;
+  let prev = 0;
+  for (let d = 1; d <= dmax; d++) {
+    const cdf = normalCdf((Math.log(d + 0.5) - mu) / Math.sqrt(s2));
+    pmf[d - 1] = cdf - prev;
+    prev = cdf;
+  }
+  return pmf;
+}
+
 /**
  * Mean days an agent is infectious in the mixing model, weighting days with
  * rash by their relative contact rate.
  *
- * @param {number} prodromalPeriod
- * @param {number} rashPeriod
- * @param {number} rashContactReduction epiworld's "Rash reduction contact
+ * @param {object} v
+ * @param {number} v.prodromalPeriod
+ * @param {number} v.prodromalSd
+ * @param {number} v.rashPeriod
+ * @param {number} v.rashSd
+ * @param {number} v.rashContactReduction epiworld's "Rash reduction contact
  *   rate": 1 means agents with rash make no contacts.
- * @param {number} hospitalizationRate Daily probability that an agent with
+ * @param {number} v.hospitalizationRate Daily probability that an agent with
  *   rash is hospitalized (which ends its contacts).
  */
-export function mixingInfectiousPeriod(prodromalPeriod, rashPeriod, rashContactReduction, hospitalizationRate) {
-  const leaveRash = Math.min(1, 1 / rashPeriod + hospitalizationRate);
-  return prodromalPeriod + (1 - rashContactReduction) / leaveRash;
+export function mixingInfectiousPeriod({ prodromalPeriod, prodromalSd, rashPeriod, rashSd, rashContactReduction, hospitalizationRate }) {
+  const prodromal = stagePmf(prodromalPeriod, prodromalSd).reduce((a, p, i) => a + p * (i + 1), 0);
+  let rashDays = 0;
+  let atLeast = 1; // P(rash period ≥ k)
+  let stay = 1;    // (1 − h)^(k − 1)
+  for (const p of stagePmf(rashPeriod, rashSd)) {
+    rashDays += atLeast * stay;
+    atLeast -= p;
+    stay *= 1 - hospitalizationRate;
+  }
+  return prodromal + (1 - rashContactReduction) * rashDays;
 }
 
 /**

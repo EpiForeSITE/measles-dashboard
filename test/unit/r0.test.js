@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
-  calibrateMatrix, effectiveR, herdImmunityThreshold, mixingInfectiousPeriod, mixingR0,
+  calibrateMatrix, effectiveR, herdImmunityThreshold, mixingInfectiousPeriod, mixingR0, stagePmf,
   schoolContactRate, schoolR0, spectralRadius,
 } from "../../src/r0.js";
 
@@ -30,10 +30,19 @@ describe("school calibration", () => {
 
 describe("mixing calibration", () => {
   const m = [[13.5, 0.75, 0.75], [1.5, 12, 1.5], [1.5, 3, 10.5]];
+  const fixed = { prodromalPeriod: 4, prodromalSd: 0, rashPeriod: 3, rashSd: 0 };
   test("infectious period accounts for rash contacts and hospitalization", () => {
-    expect(mixingInfectiousPeriod(4, 3, 1, 0.2)).toBe(4);
-    expect(mixingInfectiousPeriod(4, 3, 0, 0)).toBeCloseTo(7, 12);
-    expect(mixingInfectiousPeriod(4, 3, 0.5, 0.2)).toBeCloseTo(4 + 0.5 / (1 / 3 + 0.2), 12);
+    expect(mixingInfectiousPeriod({ ...fixed, rashContactReduction: 1, hospitalizationRate: 0.2 })).toBe(4);
+    expect(mixingInfectiousPeriod({ ...fixed, rashContactReduction: 0, hospitalizationRate: 0 })).toBeCloseTo(7, 12);
+    // In rash on days 1, 2, 3 with probabilities 1, 0.8, 0.64
+    expect(mixingInfectiousPeriod({ ...fixed, rashContactReduction: 0.5, hospitalizationRate: 0.2 })).toBeCloseTo(4 + 0.5 * 2.44, 12);
+  });
+  test("stage durations are discretized lognormals with the given mean", () => {
+    const pmf = stagePmf(12, 2.5);
+    expect(pmf.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 6);
+    expect(pmf.reduce((a, p, i) => a + p * (i + 1), 0)).toBeCloseTo(12, 1);
+    expect(pmf.slice(21).reduce((a, b) => a + b, 0)).toBeLessThan(0.005); // > 21 days
+    expect(stagePmf(3, 0)[2]).toBe(1);
   });
   test("scaled matrix implies the target R0 and keeps its shape", () => {
     const { matrix, factor } = calibrateMatrix(m, 15, 0.99, 4);

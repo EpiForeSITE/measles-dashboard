@@ -87,7 +87,7 @@
       },
       "source": "Calibrated to the target R0 with the next-generation-matrix method (Diekmann et al. 2010, J R Soc Interface 7(47):873-885)",
       "url": "https://doi.org/10.1098/rsif.2009.0386",
-      "notes": "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) / (1/rash + hospitalization rate). Scaling can be turned off."
+      "notes": "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) × (expected days with rash before recovery or hospitalization). Scaling can be turned off."
     },
     {
       "parameter": "Rash contact reduction",
@@ -111,6 +111,17 @@
       "notes": ""
     },
     {
+      "parameter": "Incubation period SD",
+      "input": "incubationSd",
+      "value": {
+        "school": "2.5 days",
+        "community": "2.5 days"
+      },
+      "source": "Lessler et al. 2009, Lancet Infect Dis 9(5):291-300: lognormal incubation period (exposure to first symptoms) with median 12.5 days and dispersion 1.23",
+      "url": "https://doi.org/10.1016/S1473-3099(09)70069-6",
+      "notes": "A dispersion of 1.23 is a coefficient of variation of 0.21, or 2.5 days at the default mean of 12 days (5th-95th percentiles 8.4-16.5 days). The fit's 5th-95th percentiles are 8.9-17.7 days. With a geometric incubation period of mean 12 days (before 0.4.1-0), 16% of cases were still latent after 21 days; with the lognormal, 0.2%."
+    },
+    {
       "parameter": "Prodromal period",
       "input": "prodromalPeriod",
       "value": {
@@ -122,6 +133,17 @@
       "notes": ""
     },
     {
+      "parameter": "Prodromal period SD",
+      "input": "prodromalSd",
+      "value": {
+        "school": "1.7 days",
+        "community": "1.7 days"
+      },
+      "source": "Fit to the 1861 Hagelloch outbreak (data in the R package surveillance, Meyer et al. 2017, J Stat Softw 77(11)): days from prodrome onset to rash onset in 188 cases, mean 3.95, sd 1.74",
+      "url": "https://doi.org/10.18637/jss.v077.i11",
+      "notes": "Interval-censored fits: lognormal with mean 4.0 and sd 1.7 (AIC 695.7) and gamma with mean 4.0 and sd 1.6 (AIC 695.0) fit equally well; an exponential (geometric) duration fits much worse (AIC 887.7). The CDC Pink Book gives a prodrome of 2-4 days (range 1-7)."
+    },
+    {
       "parameter": "Rash period",
       "input": "rashPeriod",
       "value": {
@@ -131,6 +153,17 @@
       "source": "Utah DHHS Measles Disease Plan (updated March 26, 2026): contagious to 4 days after rash onset; infectivity minimal after day 2 of rash",
       "url": "https://epi.utah.gov/wp-content/uploads/Measles-disease-plan.pdf",
       "notes": "The visible rash lasts 6-7 days; the model only tracks the infectious part."
+    },
+    {
+      "parameter": "Rash period SD",
+      "input": "rashSd",
+      "value": {
+        "school": "1 days",
+        "community": "1 days"
+      },
+      "source": "Assumption",
+      "url": "",
+      "notes": "Cases are considered contagious through 4 days after rash onset (Utah DHHS Measles Disease Plan), so the infectious part of the rash varies little. With the default mean of 3 days, 99% of rash periods last 1-6 days."
     },
     {
       "parameter": "Vaccine efficacy",
@@ -147,12 +180,12 @@
       "parameter": "Hospitalization rate",
       "input": "hospitalizationRate",
       "value": {
-        "school": "0.2 per day",
-        "community": "0.2 per day"
+        "school": "0.035 per day",
+        "community": "0.035 per day"
       },
-      "source": "Assumption: a conservative value. Recent analyses use 10%, per Jones et al. 2026, NEJM Evid 5(8): 8% overall, 9% among unvaccinated in Utah",
-      "url": "https://doi.org/10.1056/EVIDpha2600141",
-      "notes": "A daily rate, not a probability. With a 3-day rash, p = h / (h + 1/rash) = 0.2 / (0.2 + 1/3) ≈ 0.375 (37.5%)."
+      "source": "Calibrated to 10% of cases hospitalized: CDC national data for 2026 (479 of 4,588 confirmed cases, about 10%, as of October 22, 2026); 8% overall (9% among unvaccinated) in Utah per Jones et al. 2026, NEJM Evid 5(8)",
+      "url": "https://www.cdc.gov/measles/data-research/",
+      "notes": "A daily rate, not a probability. Each day with rash a person is hospitalized with probability h, so p = 1 − E[(1 − h)^D] over a rash of D days: with h = 0.035 and the default rash period, about 10%."
     },
     {
       "parameter": "Hospitalization duration",
