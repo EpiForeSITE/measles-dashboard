@@ -17,8 +17,11 @@ All notable changes to this project are documented here. The project follows
   hospitalized, as in recent data (CDC 2026; 8% in Utah). It was 20% a day,
   about 37.5% of cases. Each day with rash a person is hospitalized with this
   probability; the tooltip and the parameter table give the conversion.
-- The community model's R0 calibration uses the expected days with rash
-  under these rules (`mixingInfectiousPeriod()` in `src/r0.js`).
+- The R0 calibration of both models uses the expected days of the drawn
+  (rounded, at least 1 day) stage durations, with an analytic lognormal tail
+  (`expectedStageDays()` in `src/r0.js`): the school model's expected
+  prodromal period, and the community model's expected prodromal period plus
+  the expected days with rash before recovery or hospitalization.
 
 ## 0.2.0
 

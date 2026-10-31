@@ -21,7 +21,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCSVRecords } from "../src/csv.js";
 import { MIXING_INPUTS, SCHOOL_INPUTS } from "../src/params.js";
-import { herdImmunityThreshold, schoolContactRate } from "../src/r0.js";
+import { herdImmunityThreshold, schoolContactRate, schoolInfectiousPeriod } from "../src/r0.js";
 
 const PACKAGE_URL = "https://github.com/UofUEpiBio/measles";
 const CSV_URL = `${PACKAGE_URL}/blob/main/inst/extdata/measles_parameters.csv`;
@@ -54,7 +54,9 @@ const school = (key) => def("school", key).value;
 
 const preset = JSON.parse(readFileSync(join(root, "public", "data", "populations", `${PRESET}.json`), "utf8"));
 const presetSize = preset.groups.reduce((a, g) => a + g.size, 0);
-const contactRate = schoolContactRate(school("r0"), school("transmissionRate"), school("prodromalPeriod"));
+const schoolDefaults = Object.fromEntries(SCHOOL_INPUTS.map((d) => [d.key, d.value]));
+const contactRate = schoolContactRate(schoolDefaults);
+const prodromalDays = schoolInfectiousPeriod(schoolDefaults);
 
 const BOTH = ["school", "community"];
 const DASHBOARD_SETTING = { source: "Dashboard setting", notes: "Simulation setting, not an epidemiological parameter." };
@@ -87,7 +89,7 @@ const ROWS = [
     notes: "Per contact. Fixed high; the contacts are calibrated to R0 (src/r0.js)." },
   { label: "Contact rate", canonical: "Contact rate", models: ["school"],
     value: { school: `${contactRate.toFixed(2)} contacts per day` },
-    notes: `Not an input: R0 / (transmission × prodromal period) = ${school("r0")} / (${school("transmissionRate")} × ${school("prodromalPeriod")}), the epiworldRShiny default.` },
+    notes: `Not an input: R0 / (transmission × expected prodromal period) = ${school("r0")} / (${school("transmissionRate")} × ${prodromalDays.toFixed(2)}), with the expected days of the drawn (rounded) prodromal period.` },
   { label: "Contact matrix", canonical: "(contact matrix)", models: ["community"],
     value: { community: `Preset ${PRESET}, scaled to R0` },
     notes: "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) × (expected days with rash before recovery or hospitalization). Scaling can be turned off." },

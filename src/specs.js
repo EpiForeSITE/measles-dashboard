@@ -55,7 +55,7 @@ export function schoolSpec(v, { quarantine }) {
     // MeaslesSchool starts with round(prevalence * n) cases
     prevalence: v.initialCases / v.populationSize,
     params: {
-      "Contact rate": schoolContactRate(v.r0, v.transmissionRate, v.prodromalPeriod),
+      "Contact rate": schoolContactRate(v),
       ...diseaseParams(v, quarantine),
     },
     ...common(v),

@@ -77,7 +77,7 @@
       },
       "source": "Calibrated to the target R0 = 15",
       "url": "",
-      "notes": "Not an input: R0 / (transmission × prodromal period) = 15 / (0.99 × 4), the epiworldRShiny default."
+      "notes": "Not an input: R0 / (transmission × expected prodromal period) = 15 / (0.99 × 4.00), with the expected days of the drawn (rounded) prodromal period."
     },
     {
       "parameter": "Contact matrix",
@@ -119,7 +119,7 @@
       },
       "source": "Lessler et al. 2009, Lancet Infect Dis 9(5):291-300: lognormal incubation period (exposure to first symptoms) with median 12.5 days and dispersion 1.23",
       "url": "https://doi.org/10.1016/S1473-3099(09)70069-6",
-      "notes": "A dispersion of 1.23 is a coefficient of variation of 0.21, or 2.5 days at the default mean of 12 days (5th-95th percentiles 8.4-16.5 days). The fit's 5th-95th percentiles are 8.9-17.7 days. With a geometric incubation period of mean 12 days (before 0.4.1-0), 16% of cases were still latent after 21 days; with the lognormal, 0.2%."
+      "notes": "Incubation periods of infectious diseases are generally lognormal (Sartwell 1950, Am J Hyg 51(3):310-318). A dispersion of 1.23 is a coefficient of variation of 0.21, or 2.5 days at the default mean of 12 days (5th-95th percentiles 8.4-16.5 days). The fit's 5th-95th percentiles are 8.9-17.7 days. With a geometric incubation period of mean 12 days (before 0.4.1-0), 16% of cases were still latent after 21 days; with the lognormal, 0.2%. Derivation: data-raw/stage_durations.R (results in data-raw/stage_durations.csv)."
     },
     {
       "parameter": "Prodromal period",
@@ -141,7 +141,7 @@
       },
       "source": "Fit to the 1861 Hagelloch outbreak (data in the R package surveillance, Meyer et al. 2017, J Stat Softw 77(11)): days from prodrome onset to rash onset in 188 cases, mean 3.95, sd 1.74",
       "url": "https://doi.org/10.18637/jss.v077.i11",
-      "notes": "Interval-censored fits: lognormal with mean 4.0 and sd 1.7 (AIC 695.7) and gamma with mean 4.0 and sd 1.6 (AIC 695.0) fit equally well; an exponential (geometric) duration fits much worse (AIC 887.7). The CDC Pink Book gives a prodrome of 2-4 days (range 1-7)."
+      "notes": "Interval-censored fits: lognormal with mean 4.0 and sd 1.7 (AIC 695.7) and gamma with mean 4.0 and sd 1.6 (AIC 695.0) fit equally well; an exponential (geometric) duration fits much worse (AIC 887.7). We know of no published fit of a distribution to this period. The CDC Pink Book gives a prodrome of 2-4 days (range 1-7). Derivation: data-raw/stage_durations.R (results in data-raw/stage_durations.csv; data in data-raw/hagelloch_prodromal_days.csv)."
     },
     {
       "parameter": "Rash period",
@@ -163,7 +163,7 @@
       },
       "source": "Assumption",
       "url": "",
-      "notes": "Cases are considered contagious through 4 days after rash onset (Utah DHHS Measles Disease Plan), so the infectious part of the rash varies little. With the default mean of 3 days, 99% of rash periods last 1-6 days."
+      "notes": "No data describe the distribution of the infectious part of the rash; the lognormal is also an assumption. Cases are considered contagious through 4 days after rash onset (Utah DHHS Measles Disease Plan), so the infectious part of the rash varies little. With the default mean of 3 days, 99% of rash periods last 1-6 days. Derivation: data-raw/stage_durations.R (results in data-raw/stage_durations.csv)."
     },
     {
       "parameter": "Vaccine efficacy",
