@@ -21,7 +21,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCSVRecords } from "../src/csv.js";
 import { MIXING_INPUTS, SCHOOL_INPUTS } from "../src/params.js";
-import { herdImmunityThreshold, schoolContactRate } from "../src/r0.js";
+import { herdImmunityThreshold, schoolContactRate, schoolInfectiousPeriod } from "../src/r0.js";
 
 const PACKAGE_URL = "https://github.com/UofUEpiBio/measles";
 const CSV_URL = `${PACKAGE_URL}/blob/main/inst/extdata/measles_parameters.csv`;
@@ -54,7 +54,9 @@ const school = (key) => def("school", key).value;
 
 const preset = JSON.parse(readFileSync(join(root, "public", "data", "populations", `${PRESET}.json`), "utf8"));
 const presetSize = preset.groups.reduce((a, g) => a + g.size, 0);
-const contactRate = schoolContactRate(school("r0"), school("transmissionRate"), school("prodromalPeriod"));
+const schoolDefaults = Object.fromEntries(SCHOOL_INPUTS.map((d) => [d.key, d.value]));
+const contactRate = schoolContactRate(schoolDefaults);
+const prodromalDays = schoolInfectiousPeriod(schoolDefaults);
 
 const BOTH = ["school", "community"];
 const DASHBOARD_SETTING = { source: "Dashboard setting", notes: "Simulation setting, not an epidemiological parameter." };
@@ -87,17 +89,20 @@ const ROWS = [
     notes: "Per contact. Fixed high; the contacts are calibrated to R0 (src/r0.js)." },
   { label: "Contact rate", canonical: "Contact rate", models: ["school"],
     value: { school: `${contactRate.toFixed(2)} contacts per day` },
-    notes: `Not an input: R0 / (transmission × prodromal period) = ${school("r0")} / (${school("transmissionRate")} × ${school("prodromalPeriod")}), the epiworldRShiny default.` },
+    notes: `Not an input: R0 / (transmission × expected prodromal period) = ${school("r0")} / (${school("transmissionRate")} × ${prodromalDays.toFixed(2)}), with the expected days of the drawn (rounded) prodromal period.` },
   { label: "Contact matrix", canonical: "(contact matrix)", models: ["community"],
     value: { community: `Preset ${PRESET}, scaled to R0` },
-    notes: "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) / (1/rash + hospitalization rate). Scaling can be turned off." },
+    notes: "Not an input: the preset's matrix (the measles package example) is rescaled so the model has the chosen R0, with infectious period prodromal + (1 − rash contact reduction) × (expected days with rash before recovery or hospitalization). Scaling can be turned off." },
   { label: "Rash contact reduction", canonical: "Rash reduction contact rate", input: "rashContactReduction", models: ["community"] },
   { label: "Incubation period", canonical: "Incubation period", input: "incubationDays", models: BOTH },
+  { label: "Incubation period SD", canonical: "Incubation period sd", input: "incubationSd", models: BOTH },
   { label: "Prodromal period", canonical: "Prodromal period", input: "prodromalPeriod", models: BOTH },
+  { label: "Prodromal period SD", canonical: "Prodromal period sd", input: "prodromalSd", models: BOTH },
   { label: "Rash period", canonical: "Rash period", input: "rashPeriod", models: BOTH },
+  { label: "Rash period SD", canonical: "Rash period sd", input: "rashSd", models: BOTH },
   { label: "Vaccine efficacy", canonical: "Vax efficacy", input: "vaxEfficacy", models: BOTH },
   { label: "Hospitalization rate", canonical: "Hospitalization rate", input: "hospitalizationRate", models: BOTH, unit: "per day",
-    notes: "A daily rate, not a probability. With a 3-day rash, p = h / (h + 1/rash) = 0.2 / (0.2 + 1/3) ≈ 0.375 (37.5%)." },
+    notes: "A daily rate, not a probability. Each day with rash a person is hospitalized with probability h, so p = 1 − E[(1 − h)^D] over a rash of D days: with h = 0.035 and the default rash period, about 10%." },
   { label: "Hospitalization duration", canonical: "Hospitalization period", input: "hospitalizationDuration", models: BOTH },
   { label: "Days undetected", canonical: "Days undetected", input: "daysUndetected", models: BOTH },
   { label: "Quarantine length", canonical: "Quarantine period", input: "quarantineDays", models: BOTH,

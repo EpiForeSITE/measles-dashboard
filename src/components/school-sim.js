@@ -40,7 +40,7 @@ export class SchoolSim extends SimBase {
     const v = this.values;
     const errors = [];
     if (v.initialCases > v.populationSize) errors.push("Initial cases cannot exceed the number of students.");
-    const rate = schoolContactRate(v.r0, v.transmissionRate, v.prodromalPeriod);
+    const rate = schoolContactRate(v);
     if (rate > MAX_CONTACT_RATE)
       errors.push(`R0 ${v.r0} needs ${rate.toFixed(0)} contacts per day (max ${MAX_CONTACT_RATE}); raise the transmission probability or prodromal period.`);
     return errors;
@@ -69,8 +69,8 @@ export class SchoolSim extends SimBase {
         ? html`a typical size of ${DEFAULT_SCHOOL_SIZE} is used. Enter the real number if you know it.`
         : "the number above is used."}</div>`;
     }
-    if (key === "r0" && [v.r0, v.transmissionRate, v.prodromalPeriod].every(Number.isFinite)) {
-      const rate = schoolContactRate(v.r0, v.transmissionRate, v.prodromalPeriod);
+    if (key === "r0" && [v.r0, v.transmissionRate, v.prodromalPeriod, v.prodromalSd].every(Number.isFinite)) {
+      const rate = schoolContactRate(v);
       const reff = effectiveR(v.r0, v.propVaccinated, v.vaxEfficacy);
       return html`<div class="note">
         Each student has <strong>${rate.toFixed(1)}</strong> contacts per day.

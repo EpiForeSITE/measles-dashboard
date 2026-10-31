@@ -4,15 +4,19 @@
  * MeaslesSchool (fully mixed): only prodromal agents are infectious, and
  * each one is contacted by `contact rate` agents a day on average, so
  *
- *   R0 = contact_rate × transmission_rate × prodromal_period.
+ *   R0 = contact_rate × transmission_rate × E[prodromal period],
+ *
+ * with the expected prodromal period of the drawn (rounded) durations.
  *
  * MeaslesMixing: a susceptible agent in group i contacts each infectious
  * agent in group j with probability C[i][j] / N_j. Agents with rash are
  * infectious too, with contacts scaled by r = 1 − "Rash reduction contact
- * rate". Each day an agent with rash recovers (probability 1 / rash period)
- * or is hospitalized (the hospitalization rate), so it spends on average
- * 1 / (1 / rash + h) days with rash, and the expected infectious period is
- * D = prodromal + r / (1 / rash + h). The
+ * rate". Stages last a lognormal number of days (see stageSurvival()). Each day
+ * with rash, an agent is hospitalized with probability h (the hospitalization
+ * rate); otherwise it recovers when its rash period R ends. So it is still
+ * in rash on day k if R ≥ k and it was not hospitalized before, and the
+ * expected infectious period is D = E[prodromal] + r Σ_k P(R ≥ k) (1 − h)^(k − 1).
+ * The
  * next-generation matrix is K[i][j] = p × D × C[i][j] × N_i / N_j, which is
  * similar to p × D × C, hence
  *
@@ -23,37 +27,119 @@
  */
 
 /**
- * @param {number} r0
- * @param {number} transmissionRate
- * @param {number} prodromalPeriod
+ * Mean days a school agent is infectious: its expected prodromal period.
+ *
+ * @param {{prodromalPeriod: number, prodromalSd: number}} v
  */
-export function schoolContactRate(r0, transmissionRate, prodromalPeriod) {
-  return r0 / (transmissionRate * prodromalPeriod);
+export function schoolInfectiousPeriod({ prodromalPeriod, prodromalSd }) {
+  return expectedStageDays(prodromalPeriod, prodromalSd);
+}
+
+/**
+ * Contact rate that gives the target R0 in the school model.
+ *
+ * @param {{r0: number, transmissionRate: number, prodromalPeriod: number, prodromalSd: number}} v
+ */
+export function schoolContactRate(v) {
+  return v.r0 / (v.transmissionRate * schoolInfectiousPeriod(v));
 }
 
 /**
  * @param {number} contactRate
  * @param {number} transmissionRate
- * @param {number} prodromalPeriod
+ * @param {number} infectiousPeriod From `schoolInfectiousPeriod()`.
  */
-export function schoolR0(contactRate, transmissionRate, prodromalPeriod) {
-  return contactRate * transmissionRate * prodromalPeriod;
+export function schoolR0(contactRate, transmissionRate, infectiousPeriod) {
+  return contactRate * transmissionRate * infectiousPeriod;
+}
+
+/**
+ * erfc(x), with fractional error below 1.2e-7 everywhere (Numerical Recipes'
+ * erfcc), so that tail probabilities keep their relative accuracy.
+ */
+function erfc(x) {
+  const z = Math.abs(x);
+  const t = 1 / (1 + 0.5 * z);
+  const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+    t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+  return x >= 0 ? r : 2 - r;
+}
+
+/** P(Z > z) for a standard normal Z. */
+const normalUpper = (z) => 0.5 * erfc(z / Math.SQRT2);
+
+/** Parameters of the lognormal with this mean and sd (natural scale). */
+function lognormal(mean, sd) {
+  const s2 = Math.log(1 + (sd * sd) / (mean * mean));
+  return { mu: Math.log(mean) - s2 / 2, s: Math.sqrt(s2) };
+}
+
+/**
+ * P(D ≥ d) for a stage duration D as the measles models draw it: a lognormal
+ * X with this mean and sd (in days), rounded to whole days with a minimum of
+ * one, so D ≥ d (d ≥ 2) when X ≥ d − 0.5. An sd of 0 is a fixed duration.
+ *
+ * @param {number} mean
+ * @param {number} sd
+ * @param {number} d
+ */
+export function stageSurvival(mean, sd, d) {
+  if (d <= 1) return 1;
+  if (!(sd > 0) || !(mean > 0)) return d <= Math.max(1, Math.round(mean)) ? 1 : 0;
+  const { mu, s } = lognormal(mean, sd);
+  return normalUpper((Math.log(d - 0.5) - mu) / s);
+}
+
+/** E[(X − c)+] for the lognormal X with this mean and sd. */
+function lognormalExcess(mean, sd, c) {
+  if (!(sd > 0) || !(mean > 0)) return Math.max(0, Math.max(1, Math.round(mean)) - c);
+  const { mu, s } = lognormal(mean, sd);
+  const z = (Math.log(c) - mu) / s;
+  return mean * normalUpper(z - s) - c * normalUpper(z);
+}
+
+/**
+ * Expected days an agent spends in a stage of duration D (see
+ * stageSurvival()) when, each day, it leaves early with probability h:
+ * Σ_k P(D ≥ k) (1 − h)^(k − 1). With h = 0, this is E[D].
+ *
+ * The sum runs to day 1000, and the rest is the lognormal tail
+ * (1 − h)^1000 E[(X − 1000.5)+], with an error below
+ * (1 − h)^1000 P(X > 1000.5) days (under 1e-4 days for a mean of 4 and an
+ * sd of 30, the largest the inputs allow).
+ *
+ * @param {number} mean
+ * @param {number} sd
+ * @param {number} [h]
+ */
+export function expectedStageDays(mean, sd, h = 0) {
+  const K = 1000;
+  let days = 0;
+  let stay = 1; // (1 − h)^(k − 1)
+  for (let k = 1; k <= K; k++) {
+    days += stageSurvival(mean, sd, k) * stay;
+    stay *= 1 - h;
+  }
+  return days + stay * lognormalExcess(mean, sd, K + 0.5);
 }
 
 /**
  * Mean days an agent is infectious in the mixing model, weighting days with
  * rash by their relative contact rate.
  *
- * @param {number} prodromalPeriod
- * @param {number} rashPeriod
- * @param {number} rashContactReduction epiworld's "Rash reduction contact
+ * @param {object} v
+ * @param {number} v.prodromalPeriod
+ * @param {number} v.prodromalSd
+ * @param {number} v.rashPeriod
+ * @param {number} v.rashSd
+ * @param {number} v.rashContactReduction epiworld's "Rash reduction contact
  *   rate": 1 means agents with rash make no contacts.
- * @param {number} hospitalizationRate Daily probability that an agent with
+ * @param {number} v.hospitalizationRate Daily probability that an agent with
  *   rash is hospitalized (which ends its contacts).
  */
-export function mixingInfectiousPeriod(prodromalPeriod, rashPeriod, rashContactReduction, hospitalizationRate) {
-  const leaveRash = Math.min(1, 1 / rashPeriod + hospitalizationRate);
-  return prodromalPeriod + (1 - rashContactReduction) / leaveRash;
+export function mixingInfectiousPeriod({ prodromalPeriod, prodromalSd, rashPeriod, rashSd, rashContactReduction, hospitalizationRate }) {
+  return expectedStageDays(prodromalPeriod, prodromalSd) +
+    (1 - rashContactReduction) * expectedStageDays(rashPeriod, rashSd, hospitalizationRate);
 }
 
 /**
